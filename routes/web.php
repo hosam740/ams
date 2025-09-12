@@ -10,7 +10,7 @@ use App\Http\Controllers\Authentication\AuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('dashboard/dashboard');
 });
 
 Route::middleware('guest')->group(function () {
