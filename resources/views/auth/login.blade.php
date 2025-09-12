@@ -6,6 +6,9 @@
     <div class="alert alert-success small">{{ session('status') }}</div>
   @endif
 
+  {{-- أخطاء غير معروفة/غير مرتبطة بحقل معيّن + session('error') --}}
+  @include('components.global-errors', ['skip' => ['email','password','remember']])
+
   <form method="POST" action="{{ route('login') }}" class="auth-form">
     @csrf
 
@@ -59,6 +62,7 @@
     ليس لديك حساب؟ <a href="{{ route('register') }}">إنشاء حساب</a>
   </div>
 @endsection
+
 
 
 
