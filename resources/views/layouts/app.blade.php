@@ -1,4 +1,41 @@
-<!doctype html>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@yield('title','نظام إدارة الأصول العقارية')</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    {{-- خطوط وأيقونات --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+    {{-- Bootstrap RTL --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css"/>
+
+    {{-- ملفات Vite --}}
+    @vite(['resources/css/base.css','resources/css/app.css','resources/js/app.js'])
+</head>
+<body>
+    {{-- Sidebar --}}
+    @include('partials.sidebar')
+
+    {{-- Topbar --}}
+    @include('partials.topbar')
+
+    {{-- Main --}}
+    <main id="main" class="main mini">
+        <div class="content-area">
+            @yield('content')
+        </div>
+    </main>
+
+    {{-- Bootstrap JS (لو تحتاجه) --}}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+<!-- <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="utf-8">
@@ -99,4 +136,4 @@
         integrity="sha384-s4r+2w03nfb3S2qFfC5qK3T7gQhQbTt+zqQ3aA9m0n8mJrj7q9T8b0E2zG+6x8yB"
         crossorigin="anonymous"></script>
 </body>
-</html>
+</html> -->

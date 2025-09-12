@@ -1,0 +1,71 @@
+/* ===================== Base Reset ===================== */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+img, svg { display:block; max-width:100%; }
+
+/* نضمن أن المشروع RTL افتراضيًا */
+html[dir="rtl"] body {
+  direction: rtl;
+}
+
+/* ===================== Design Tokens ===================== */
+:root{
+  /* ألوان أساسية */
+  --primary-dark:#0b1223;
+  --secondary-dark:#121a2f;
+  --primary-blue:#3b82f6;
+  --secondary-blue:#60a5fa;
+  --accent-blue:#93c5fd;
+
+  /* ألوان واجهة */
+  --light-bg:#f1f5f9;
+  --card-bg:#ffffff;
+  --text-dark:#0f172a;
+  --text-light:#64748b;
+  --text-lighter:#94a3b8;
+
+  /* حالات */
+  --success-color:#10b981;
+  --warning-color:#f59e0b;
+  --danger-color:#ef4444;
+
+  /* حدود/ظلال */
+  --border-color:#e2e8f0;
+  --shadow-1: 0 2px 14px rgba(2,8,23,.06);
+  --shadow-2: 0 10px 25px rgba(2,8,23,.08);
+
+  /* مسافات/أنصاف أقطار/زمن انتقال */
+  --radius-lg:18px;
+  --radius-md:12px;
+  --radius-sm:10px;
+  --trans: all .25s cubic-bezier(.2,.6,.2,1);
+
+  /* أحجام عامة */
+  --header-h:72px;
+  --sidebar-w:280px;
+  --sidebar-mini:84px;
+}
+
+/* (اختياري) دعم وضع داكن عبر data-theme */
+[data-theme="dark"]{
+  --light-bg:#0b1223;
+  --card-bg:#0f172a;
+  --text-dark:#e5e7eb;
+  --text-light:#94a3b8;
+  --border-color:#1f2a44;
+  --shadow-1: 0 2px 14px rgba(0,0,0,.5);
+  --shadow-2: 0 10px 25px rgba(0,0,0,.55);
+}
+
+/* ===================== Base Elements ===================== */
+body{
+  font-family:'Tajawal','Segoe UI',sans-serif;
+  background: var(--light-bg);
+  color: var(--text-dark);
+}
+
+/* أدوات صغيرة شائعة (utilities) - خفيفة ومفيدة */
+.round-lg{ border-radius: var(--radius-lg); }
+.round-md{ border-radius: var(--radius-md); }
+.shadow-1{ box-shadow: var(--shadow-1); }
+.shadow-2{ box-shadow: var(--shadow-2); }

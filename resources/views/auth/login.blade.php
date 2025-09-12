@@ -1,4 +1,70 @@
-<!DOCTYPE html>
+@extends('layouts.auth')
+@section('title','تسجيل الدخول')
+
+@section('content')
+  @if (session('status'))
+    <div class="alert alert-success small">{{ session('status') }}</div>
+  @endif
+
+  <form method="POST" action="{{ route('login') }}" class="auth-form">
+    @csrf
+
+    <div class="mb-3">
+      <label class="form-label">البريد الإلكتروني</label>
+      <input
+        type="email"
+        name="email"
+        value="{{ old('email') }}"
+        class="form-control @error('email') is-invalid @enderror"
+        required autofocus>
+      @error('email')
+        <div class="invalid-feedback d-block">{{ $message }}</div>
+      @enderror
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label d-flex justify-content-between">
+        <span>كلمة المرور</span>
+        @if (Route::has('password.request'))
+          <a class="small" href="{{ route('password.request') }}">نسيت كلمة المرور؟</a>
+        @endif
+      </label>
+
+      <div class="toggle-wrap">
+        <input
+          type="password"
+          name="password"
+          id="loginPassword"
+          class="form-control @error('password') is-invalid @enderror"
+          required>
+        <button type="button" class="toggle-pass" data-toggle-password="#loginPassword" aria-label="إظهار/إخفاء">
+          <i class="fa-regular fa-eye"></i>
+        </button>
+      </div>
+
+      @error('password')
+        <div class="invalid-feedback d-block">{{ $message }}</div>
+      @enderror
+    </div>
+
+    <div class="mb-3 form-check">
+      <input class="form-check-input" type="checkbox" name="remember" id="remember">
+      <label class="form-check-label" for="remember">تذكرني</label>
+    </div>
+
+    <button type="submit" class="btn btn-brand w-100">تسجيل الدخول</button>
+  </form>
+
+  <div class="text-center mt-4 small">
+    ليس لديك حساب؟ <a href="{{ route('register') }}">إنشاء حساب</a>
+  </div>
+@endsection
+
+
+
+
+
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -40,4 +106,4 @@
         <a href="{{ route('show.register') }}">Register here</a>
     </p>
 </body>
-</html>
+</html> -->

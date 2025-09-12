@@ -1,0 +1,90 @@
+/* ===== صفحات المصادقة (تعتمد على tokens من base.css) ===== */
+.auth-bg{
+    background:
+      radial-gradient(1200px 600px at 100% -10%, rgba(59,130,246,.10), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(96,165,250,.10), transparent 60%),
+      var(--light-bg);
+    min-height: 100vh;
+  }
+  
+  .auth-wrapper{
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px 12px;
+  }
+  
+  .auth-card{
+    width: min(560px, 100%);
+    border-radius: 18px;
+    box-shadow: var(--shadow-1);
+    background: var(--card-bg);
+  }
+  
+  .auth-logo{
+    width: 56px; height: 56px; margin: 0 auto; border-radius: 16px;
+    display: grid; place-items: center;
+    background: linear-gradient(135deg, rgba(59,130,246,.15), rgba(96,165,250,.12));
+    color: var(--primary-blue); font-size: 1.35rem;
+  }
+  
+  /* زر بعلامة الهوية (أولوية أعلى من bootstrap .btn) */
+  .btn.btn-brand{
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+    color: #fff;
+    font-weight: 700;
+    border-radius: 12px;
+    padding: 10px 14px;
+  }
+  .btn.btn-brand:hover{
+    background-color: var(--secondary-blue);
+    border-color: var(--secondary-blue);
+    color: #fff;
+  }
+  
+  /* ===================== أيقونة إظهار/إخفاء كلمة المرور ===================== */
+  /* (1) الحاوية التي تحتوي على الحقل + زر العين */
+  .has-toggle{ position: relative; }
+  
+  /* (2) نعطي مساحة كافية على يسار الحقل للزر */
+  .has-toggle .form-control{
+    padding-left: 42px; /* يمكن رفعها إلى 46px إذا أردت مسافة أكبر */
+  }
+  
+  /* غلاف الحقل الذي يحتوي على الإدخال + زر العين فقط */
+    .toggle-wrap{ position: relative; }
+
+    /* مساحة كافية على يسار الحقل لزر العين (RTL) */
+    .toggle-wrap .form-control{
+    padding-left: 42px; /* عدّلها 40–48px حسب ذوقك */
+    }
+
+    /* زر إظهار/إخفاء كلمة المرور: يسار الحقل ومتمركز عموديًا */
+    .toggle-pass{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 10px;      /* يسار الحقل */
+    right: auto;
+    width: 28px; height: 28px;
+    display: grid; place-items: center;
+    border: 0; background: transparent; padding: 0;
+    color: #94a3b8; line-height: 1;
+    }
+    .toggle-pass:hover{ color: #64748b; }
+    .toggle-pass i{ font-size: 1rem; line-height: 1; }
+
+    /* تحسين شكل التنبيه أسفل الحقل */
+    .invalid-feedback.d-block{ margin-top: .35rem; }
+  
+  /* تحسينات */
+  .form-label{ font-weight: 600; }
+  .form-check-input:checked{
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+  }
+  
+  /* ارتفاع مريح للمدخلات داخل كرت المصادقة */
+  .auth-card .form-control{ min-height: 44px; }
+  
