@@ -1,84 +1,74 @@
 @extends('layouts.app')
-
-@section('title', 'قائمة العقارات')
+@section('title','العقارات')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="mb-0">العقارات</h4>
-    <div>
-        <a href="{{ route('properties.create') }}" class="btn btn-primary">
-            <i class="bi bi-plus-lg"></i> إنشاء عقار
-        </a>
-    </div>
-</div>
+    @include('components.global-errors')
 
-@if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
-@endif
+    @if($properties->isEmpty())
+        <div class="bg-white shadow-1 round-lg p-8 text-center">
+            <div class="text-2xl font-extrabold mb-2">لا توجد عقارات</div>
+            <div class="text-gray-500">استخدم شريط البحث العلوي أو أضف عقارًا جديدًا.</div>
+        </div>
+    @else
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach($properties as $property)
+                <div class="bg-white shadow-1 round-lg p-4 flex flex-col gap-4">
+                    <div class="flex items-start justify-between gap-2">
+                        <div>
+                            <div class="text-sm text-[var(--text-lighter)]">الأصل</div>
+                            <div class="font-semibold">{{ optional($property->asset)->name ?? '—' }}</div>
+                        </div>
+                        @php
+                            $status = $property->status ?? null;
+                            $statusColor = match($status){
+                                'available' => 'bg-green-100 text-green-700',
+                                'rented'    => 'bg-amber-100 text-amber-700',
+                                'archived'  => 'bg-gray-100 text-gray-700',
+                                default     => 'bg-blue-100 text-blue-700'
+                            };
+                        @endphp
+                        @if($status)
+                            <span class="text-xs px-2 py-1 rounded-md {{ $statusColor }}">{{ __($status) }}</span>
+                        @endif
+                    </div>
 
-@if($properties->isEmpty())
-    <div class="alert alert-info">لا توجد عقارات حالياً.</div>
-@else
-<div class="table-responsive">
-    <table class="table table-hover align-middle">
-        <thead class="table-light">
-            <tr>
-                <th>#</th>
-                <th>اسم الأصل</th>
-                <th>الدولة</th>
-                <th>المدينة</th>
-                <th>الحي</th>
-                <th class="text-nowrap">المساحة (م²)</th>
-                <th class="text-center" style="width: 220px;">إجراءات</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($properties as $i => $property)
-                <tr>
-                    <td>{{ $i + 1 }}</td>
-                    <td>{{ optional($property->asset)->name ?? '—' }}</td>
-                    <td>{{ $property->country }}</td>
-                    <td>{{ $property->city }}</td>
-                    <td>{{ $property->neighborhood }}</td>
-                    <td>{{ rtrim(rtrim(number_format($property->area, 2, '.', ''), '0'), '.') }}</td>
-                    <td>{{ optional($property->asset?->manager)->name ?? '—' }}</td>
-                    <td class="text-center">
-                        {{-- عرض الوحدات المرتبطة (نمرر property_id كـ query param) --}}
-                        <a href="{{ route('units.index', ['property_id' => $property->id]) }}"
-                           class="btn btn-outline-info btn-sm me-1"
-                           title="عرض الوحدات">
-                            <i class="bi bi-grid"></i>
-                        </a>
+                    <div class="grid grid-cols-2 gap-3 text-sm">
+                        <div class="rounded-md border border-[var(--border-color)] px-3 py-2">
+                            <div class="text-[12px] text-[var(--text-lighter)] mb-1">الدولة</div>
+                            <div class="font-semibold">{{ $property->country ?? '—' }}</div>
+                        </div>
+                        <div class="rounded-md border border-[var(--border-color)] px-3 py-2">
+                            <div class="text-[12px] text-[var(--text-lighter)] mb-1">المدينة</div>
+                            <div class="font-semibold">{{ $property->city ?? '—' }}</div>
+                        </div>
+                        <div class="rounded-md border border-[var(--border-color)] px-3 py-2">
+                            <div class="text-[12px] text-[var(--text-lighter)] mb-1">الحي</div>
+                            <div class="font-semibold">{{ $property->neighborhood ?? '—' }}</div>
+                        </div>
+                        <div class="rounded-md border border-[var(--border-color)] px-3 py-2">
+                            <div class="text-[12px] text-[var(--text-lighter)] mb-1">المساحة</div>
+                            <div class="font-semibold">{{ $property->area ?? '—' }}</div>
+                        </div>
+                    </div>
 
-                        {{-- عرض تفاصيل العقار --}}
-                        <a href="{{ route('properties.show', $property) }}"
-                           class="btn btn-outline-secondary btn-sm me-1"
-                           title="عرض">
-                            <i class="bi bi-eye"></i>
-                        </a>
+                    @if(!empty($property->url_location))
+                        <a href="{{ $property->url_location }}" target="_blank" rel="noopener"
+                           class="text-sm text-blue-600 hover:underline">موقع الخريطة</a>
+                    @endif
 
-                        {{-- تعديل العقار --}}
-                        <a href="{{ route('properties.edit', $property) }}"
-                           class="btn btn-outline-primary btn-sm me-1"
-                           title="تعديل">
-                            <i class="bi bi-pencil-square"></i>
-                        </a>
-
-                        {{-- حذف العقار --}}
-                        <form action="{{ route('properties.destroy', $property) }}"
-                              method="POST" class="d-inline"
-                              onsubmit="return confirm('هل أنت متأكد من حذف هذا العقار؟ سيتم حذف الأصل المرتبط أيضاً إن كانت لديك معالجة لذلك.');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-outline-danger btn-sm" title="حذف">
-                                <i class="bi bi-trash3"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>
+                    <div class="flex items-center justify-between pt-2">
+                        <a href="{{ route('properties.show', $property->id) }}"
+                           class="text-sm font-semibold text-blue-600 hover:underline">التفاصيل</a>
+                        @can('update', $property)
+                        <a href="{{ route('properties.edit', $property->id) }}"
+                           class="text-sm font-semibold hover:underline">تعديل</a>
+                        @endcan
+                    </div>
+                </div>
             @endforeach
-        </tbody>
-    </table>
-</div>
-@endif
+        </div>
+    @endif
+    
 @endsection
+
+

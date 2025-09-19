@@ -1,0 +1,89 @@
+{{--
+
+    @extends('layouts.app')
+
+    @section('title', 'قائمة العقارات')
+
+    @section('content')
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">العقارات</h4>
+        <div>
+            <a href="{{ route('properties.create') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> إنشاء عقار
+            </a>
+        </div>
+    </div>
+
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+
+    @if($properties->isEmpty())
+        <div class="alert alert-info">لا توجد عقارات حالياً.</div>
+    @else
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>اسم الأصل</th>
+                    <th>الدولة</th>
+                    <th>المدينة</th>
+                    <th>الحي</th>
+                    <th class="text-nowrap">المساحة (م²)</th>
+                    <th class="text-center" style="width: 220px;">إجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($properties as $i => $property)
+                    <tr>
+                        <td>{{ $i + 1 }}</td>
+                        <td>{{ optional($property->asset)->name ?? '—' }}</td>
+                        <td>{{ $property->country }}</td>
+                        <td>{{ $property->city }}</td>
+                        <td>{{ $property->neighborhood }}</td>
+                        <td>{{ rtrim(rtrim(number_format($property->area, 2, '.', ''), '0'), '.') }}</td>
+                        <td>{{ optional($property->asset?->manager)->name ?? '—' }}</td>
+                        <td class="text-center">
+                            {{-- عرض الوحدات المرتبطة (نمرر property_id كـ query param) --}}
+                            <a href="{{ route('units.index', ['property_id' => $property->id]) }}"
+                            class="btn btn-outline-info btn-sm me-1"
+                            title="عرض الوحدات">
+                                <i class="bi bi-grid"></i>
+                            </a>
+
+                            {{-- عرض تفاصيل العقار --}}
+                            <a href="{{ route('properties.show', $property) }}"
+                            class="btn btn-outline-secondary btn-sm me-1"
+                            title="عرض">
+                                <i class="bi bi-eye"></i>
+                            </a>
+
+                            {{-- تعديل العقار --}}
+                            <a href="{{ route('properties.edit', $property) }}"
+                            class="btn btn-outline-primary btn-sm me-1"
+                            title="تعديل">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+
+                            {{-- حذف العقار --}}
+                            <form action="{{ route('properties.destroy', $property) }}"
+                                method="POST" class="d-inline"
+                                onsubmit="return confirm('هل أنت متأكد من حذف هذا العقار؟ سيتم حذف الأصل المرتبط أيضاً إن كانت لديك معالجة لذلك.');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-outline-danger btn-sm" title="حذف">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    @endif
+    @endsection
+
+
+--}}
