@@ -64,6 +64,22 @@ body{
   color: var(--text-dark);
 }
 
+/* زر بعلامة الهوية (ينطبق على كل الموقع) */
+.btn.btn-brand{
+  background-color: var(--primary-blue);
+  border-color: var(--primary-blue);
+  color: #fff;
+  font-weight: 700;
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+.btn.btn-brand:hover{
+  background-color: var(--secondary-blue);
+  border-color: var(--secondary-blue);
+  color: #fff;
+}
+
+
 /* أدوات صغيرة شائعة (utilities) - خفيفة ومفيدة */
 .round-lg{ border-radius: var(--radius-lg); }
 .round-md{ border-radius: var(--radius-md); }

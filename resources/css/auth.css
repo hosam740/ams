@@ -28,7 +28,7 @@
     color: var(--primary-blue); font-size: 1.35rem;
   }
   
-  /* زر بعلامة الهوية (أولوية أعلى من bootstrap .btn) */
+  /* زر بعلامة الهوية (أولوية أعلى من bootstrap .btn)
   .btn.btn-brand{
     background-color: var(--primary-blue);
     border-color: var(--primary-blue);
@@ -41,7 +41,7 @@
     background-color: var(--secondary-blue);
     border-color: var(--secondary-blue);
     color: #fff;
-  }
+  } */
   
   /* ===================== أيقونة إظهار/إخفاء كلمة المرور ===================== */
   /* (1) الحاوية التي تحتوي على الحقل + زر العين */

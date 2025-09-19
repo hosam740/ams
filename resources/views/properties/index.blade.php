@@ -4,71 +4,77 @@
 @section('content')
     @include('components.global-errors')
 
-    @if($properties->isEmpty())
-        <div class="bg-white shadow-1 round-lg p-8 text-center">
-            <div class="text-2xl font-extrabold mb-2">لا توجد عقارات</div>
-            <div class="text-gray-500">استخدم شريط البحث العلوي أو أضف عقارًا جديدًا.</div>
+    <div class="bg-white shadow-1 round-lg p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="fw-bold mb-0">
+                <i class="fas fa-building me-2 text-primary"></i> قائمة العقارات
+            </h3>
+            <a href="{{ route('properties.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> إضافة عقار
+            </a>
         </div>
-    @else
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach($properties as $property)
-                <div class="bg-white shadow-1 round-lg p-4 flex flex-col gap-4">
-                    <div class="flex items-start justify-between gap-2">
-                        <div>
-                            <div class="text-sm text-[var(--text-lighter)]">الأصل</div>
-                            <div class="font-semibold">{{ optional($property->asset)->name ?? '—' }}</div>
-                        </div>
-                        @php
-                            $status = $property->status ?? null;
-                            $statusColor = match($status){
-                                'available' => 'bg-green-100 text-green-700',
-                                'rented'    => 'bg-amber-100 text-amber-700',
-                                'archived'  => 'bg-gray-100 text-gray-700',
-                                default     => 'bg-blue-100 text-blue-700'
-                            };
-                        @endphp
-                        @if($status)
-                            <span class="text-xs px-2 py-1 rounded-md {{ $statusColor }}">{{ __($status) }}</span>
-                        @endif
-                    </div>
 
-                    <div class="grid grid-cols-2 gap-3 text-sm">
-                        <div class="rounded-md border border-[var(--border-color)] px-3 py-2">
-                            <div class="text-[12px] text-[var(--text-lighter)] mb-1">الدولة</div>
-                            <div class="font-semibold">{{ $property->country ?? '—' }}</div>
-                        </div>
-                        <div class="rounded-md border border-[var(--border-color)] px-3 py-2">
-                            <div class="text-[12px] text-[var(--text-lighter)] mb-1">المدينة</div>
-                            <div class="font-semibold">{{ $property->city ?? '—' }}</div>
-                        </div>
-                        <div class="rounded-md border border-[var(--border-color)] px-3 py-2">
-                            <div class="text-[12px] text-[var(--text-lighter)] mb-1">الحي</div>
-                            <div class="font-semibold">{{ $property->neighborhood ?? '—' }}</div>
-                        </div>
-                        <div class="rounded-md border border-[var(--border-color)] px-3 py-2">
-                            <div class="text-[12px] text-[var(--text-lighter)] mb-1">المساحة</div>
-                            <div class="font-semibold">{{ $property->area ?? '—' }}</div>
-                        </div>
-                    </div>
-
-                    @if(!empty($property->url_location))
-                        <a href="{{ $property->url_location }}" target="_blank" rel="noopener"
-                           class="text-sm text-blue-600 hover:underline">موقع الخريطة</a>
-                    @endif
-
-                    <div class="flex items-center justify-between pt-2">
-                        <a href="{{ route('properties.show', $property->id) }}"
-                           class="text-sm font-semibold text-blue-600 hover:underline">التفاصيل</a>
-                        @can('update', $property)
-                        <a href="{{ route('properties.edit', $property->id) }}"
-                           class="text-sm font-semibold hover:underline">تعديل</a>
-                        @endcan
-                    </div>
-                </div>
-            @endforeach
-        </div>
-    @endif
-    
+        @if($properties->isEmpty())
+            <div class="alert alert-info mb-0">لا توجد عقارات حالياً.</div>
+        @else
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>الاسم</th>
+                            <th>الدولة</th>
+                            <th>المدينة</th>
+                            <th>الحي</th>
+                            <th>المساحة</th>
+                            <th>الحالة</th>
+                            <th class="text-center" style="width: 180px;">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($properties as $property)
+                            <tr>
+                                <td>{{ optional($property->asset)->name ?? '—' }}</td>
+                                <td>{{ $property->country ?? '—' }}</td>
+                                <td>{{ $property->city ?? '—' }}</td>
+                                <td>{{ $property->neighborhood ?? '—' }}</td>
+                                <td>{{ $property->area ? number_format($property->area) . ' م²' : '—' }}</td>
+                                <td>
+                                    @php
+                                        $status = $property->status ?? 'غير محدد';
+                                        $color = match($status) {
+                                            'available'   => 'success',
+                                            'rented'      => 'danger',
+                                            'archived'    => 'secondary',
+                                            'maintenance' => 'warning',
+                                            default       => 'info'
+                                        };
+                                    @endphp
+                                    <span class="badge bg-{{ $color }}">{{ __($status) }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <a href="{{ route('properties.show', $property) }}"
+                                       class="btn btn-sm btn-outline-info me-1" title="عرض">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ route('properties.edit', $property) }}"
+                                       class="btn btn-sm btn-outline-primary me-1" title="تعديل">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('properties.destroy', $property) }}" method="POST"
+                                          class="d-inline"
+                                          onsubmit="return confirm('هل أنت متأكد من الحذف؟');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="حذف">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+    </div>
 @endsection
-
-

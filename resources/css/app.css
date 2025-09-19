@@ -125,6 +125,7 @@
   border-radius: 2px; background: linear-gradient(90deg, var(--primary-blue), var(--secondary-blue));
 }
 
+
 /* Responsive Sidebar سلوك الجوال */
 @media (max-width: 992px){
   .sidebar{ transform: translateX(100%); width: min(86vw, var(--sidebar-w)); }
