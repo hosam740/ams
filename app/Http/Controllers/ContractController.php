@@ -5,11 +5,18 @@ namespace App\Http\Controllers;
 use App\Models\Contract;
 use App\Http\Requests\Contracts\StoreContractRequest;
 use App\Http\Requests\Contracts\UpdateContractRequest;
+use App\Services\Contract\ContractService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ContractController extends Controller
 {
+
+    private function getContractStatus($data): string {
+
+        return ContractService::setContractStatusValue($data);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -40,13 +47,13 @@ class ContractController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     * ['tenant_id', 'beginning_date', 'end_date', 'total_amount', 'payment_plan', 'active', 'ended_at', 'unit_id'];
+     * ['tenant_id', 'beginning_date', 'end_date', 'total_amount', 'payment_plan', 'status', 'ended_at', 'unit_id'];
      */
     public function store(StoreContractRequest $request)
     {
         //
         $data = $request->validated();
-        $data['active'] = true;
+        $data['status'] = $this->getContractStatus($data);
 
         // contract model may throwes an error when vaiolating some rules
         try {
@@ -110,7 +117,7 @@ class ContractController extends Controller
         DB::transaction(function () use ($contract) {
             $contract->update([
                 'ended_at' => now(),
-                'active'   => false,
+                'status'   => 'terminated',
             ]);
         
             $contract->payments()

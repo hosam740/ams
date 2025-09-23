@@ -50,7 +50,12 @@ class PropertyController extends Controller
     public function index()
     {
         //
-        $properties = Property::all();
+        $properties = Property::query()
+                ->whereHas('asset', function ($q) {
+                    $q->where('manager_id', Auth::id());})
+                    ->with(['asset'])->get();
+
+
 
         return view('properties.index', compact('properties'));
     }

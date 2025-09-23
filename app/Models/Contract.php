@@ -21,8 +21,21 @@ class Contract extends Model
     protected $fillable = ['tenant_id', 'beginning_date', 'end_date', 'total_amount', 'payment_plan', 'active', 'ended_at', 'unit_id'];
 
 
+    private static $contract_status_values =  ['pending', 'active', 'expired', 'terminated'];
+
+
 
     private static $payment_plan_values =  ['monthly', 'quarterly', 'triannual', 'semiannual', 'annually'];
+
+    public function setStatusAttribute($value){
+
+        if(!in_array($value, self::$contract_status_values)){
+
+            throw new \InvalidArgumentException("Invalid contract status value: {$value} in contract model.");
+        }
+
+        $this->attributes['status'] = $value;
+    }
 
 
     public function setPayment_planAttribute($value){
@@ -33,6 +46,11 @@ class Contract extends Model
         }
 
         $this->attributes['payment_plan'] = $value;
+    }
+
+    public static function getContractStatusValues(): array{
+
+        return self::$contract_status_values;
     }
 
     public static function getPaymentPlanValues(): array{
@@ -88,12 +106,12 @@ class Contract extends Model
 
 
 
-    // this function throws an error when tring to add active conrtact to a unit that has one
+    // this function throws an error when tring to add active/pending conrtact to a unit that has one
     private static function validateUniqueActiveContract($contract){
 
-        if($contract->active){
+        if($contract->status == 'active'){
 
-            $query = self::where('unit_id', $contract->unit_id)->where('active', true);
+            $query = self::where('unit_id', $contract->unit_id)->whereIn('status', ['active', 'pending']);
 
             if($contract->exists){
                 $query->where('id', '!=', $contract->id);

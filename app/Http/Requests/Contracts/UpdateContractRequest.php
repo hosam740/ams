@@ -79,7 +79,7 @@ class UpdateContractRequest extends FormRequest
             'ended_at'       => 'تاريخ الإنهاء',
             'total_amount'   => 'المبلغ الإجمالي',
             'payment_plan'   => 'خطة الدفع',
-            'active'         => 'التفعيل',
+            'status'         => 'حالة العقد',
         ];
     }
 

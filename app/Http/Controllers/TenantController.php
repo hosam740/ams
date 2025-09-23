@@ -96,7 +96,7 @@ class TenantController extends Controller
     public function destroy(Tenants $tenants)
     {
         //
-        if ($tenants->contracts()->where('active', true)->exists()) {
+        if ($tenants->contracts()->whereIn('status', ['active', 'pending'])->exists()) {
             return back()->withErrors([
                 'tenant' => 'لا يمكن حذف المستأجر لوجود عقد نشط مرتبط به.'
             ]);

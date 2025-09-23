@@ -21,7 +21,12 @@ return new class extends Migration
             $table->date('end_date');
             $table->decimal('total_amount', 20, 2);
             $table->enum('payment_plan', ['monthly', 'quarterly', 'triannual', 'semiannual', 'annually'])->default('monthly');
-            $table->boolean('active')->default(true);
+            $table->enum('status', [
+                'pending',     // لم يبدأ
+                'active',      // ساري
+                'terminated',  // مفسوخ
+                'expired'      // منتهي
+            ])->default('pending');
             $table->date('ended_at')->nullable();
 
             // contract/unit relationship
