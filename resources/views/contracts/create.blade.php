@@ -27,7 +27,7 @@
                 <select name="tenant_id" id="tenant_id"
                         class="form-select @error('tenant_id') is-invalid @enderror" required>
                     <option value="">-- اختر المستأجر --</option>
-                    @foreach (\App\Models\Tenants::orderBy('first_name')->orderBy('last_name')->get() as $tenant)
+                    @foreach (\App\Models\Tenant::orderBy('first_name')->orderBy('last_name')->get() as $tenant)
                         <option value="{{ $tenant->id }}" {{ old('tenant_id') == $tenant->id ? 'selected' : '' }}>
                             {{ $tenant->first_name }} {{ $tenant->last_name }} — {{ $tenant->national_id }}
                         </option>

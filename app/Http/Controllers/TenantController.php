@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Tenants;
-use App\Http\Requests\Tenants\StoreTenantRequest;
-use App\Http\Requests\Tenants\UpdateTenantRequest;
+use App\Models\Tenant;
+use App\Http\Requests\Tenant\StoreTenantRequest;
+use App\Http\Requests\Tenant\UpdateTenantRequest;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -17,10 +17,10 @@ class TenantController extends Controller
     {
 
 
-        $tenants = Tenants::all();
+        $tenants = Tenant::all();
 
         //                  to fech tenants with active contract only 
-        // $tenants = Tenants::whereHas('contracts', function ($q) {
+        // $tenants = Tenant::whereHas('contracts', function ($q) {
         //     $q->where('active', true)
 
         //     // fech tenants with the condition 
@@ -54,7 +54,7 @@ class TenantController extends Controller
         // the validation rules are in StoreTenantRequest.php file, and the validated() method go to this file
         $data = $request->validated();
 
-        Tenants::create($data);
+        Tenant::create($data);
 
         return redirect()->route('tenants.index')->with('success', 'تم إضافة المستأجر بنجاح');
     }
@@ -62,16 +62,16 @@ class TenantController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Tenants $tenants)
+    public function show(Tenant $tenant)
     {
         //
-        return view('tenants.show', compact('tenants'));
+        return view('tenants.show', compact('tenant'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Tenants $tenant)
+    public function edit(Tenant $tenant)
     {
         //
         return view('tenants.edit', compact('tenant'));
@@ -80,12 +80,12 @@ class TenantController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTenantRequest $request, Tenants $tenants)
+    public function update(UpdateTenantRequest $request, Tenant $tenant)
     {
         //
         $data = $request->validated();
 
-        $tenants->update($data);
+        $tenant->update($data);
 
         return redirect()->route('tenants.index')->with('success', 'تم تحديث المستأجر بنجاح');
     }
@@ -93,16 +93,16 @@ class TenantController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Tenants $tenants)
+    public function destroy(Tenant $tenant)
     {
         //
-        if ($tenants->contracts()->whereIn('status', ['active', 'pending'])->exists()) {
+        if ($tenant->contracts()->whereIn('status', ['active', 'pending'])->exists()) {
             return back()->withErrors([
                 'tenant' => 'لا يمكن حذف المستأجر لوجود عقد نشط مرتبط به.'
             ]);
         }
 
-        $tenants->delete();
+        $tenant->delete();
 
         return redirect()->route('tenants.index')->with('success', 'تم حذف المستأجر بنجاح');
     }

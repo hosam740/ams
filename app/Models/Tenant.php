@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 
-class Tenants extends Model
+class Tenant extends Model
 {
-    /** @use HasFactory<\Database\Factories\TenantsFactory> */
+    /** @use HasFactory<\Database\Factories\TenantFactory> */
     use HasFactory;
     use SoftDeletes;
 

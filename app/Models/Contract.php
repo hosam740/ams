@@ -63,7 +63,7 @@ class Contract extends Model
     // tenant/contract relationship
     public function tenant(): BelongsTo
     {
-        return $this->belongsTo(Tenants::class, 'tenant_id');
+        return $this->belongsTo(Tenant::class, 'tenant_id');
     }
 
     // contract/unit relationship
