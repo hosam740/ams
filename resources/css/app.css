@@ -124,6 +124,13 @@
   content:""; position: absolute; bottom: 0; right: 0; width: 56px; height: 4px;
   border-radius: 2px; background: linear-gradient(90deg, var(--primary-blue), var(--secondary-blue));
 }
+/* Force all selects to open in RTL */
+select.form-select {
+  direction: rtl;
+  text-align: right;
+}
+
+
 
 
 /* Responsive Sidebar سلوك الجوال */

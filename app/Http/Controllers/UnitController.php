@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\assets\Unit;
+use App\Models\assets\Property;
 use App\Http\Requests\Units\StoreUnitRequest;
 use App\Http\Requests\Units\UpdateUnitRequest;
 use Illuminate\Support\Facades\Auth;
@@ -44,11 +45,18 @@ class UnitController extends Controller
     public function create()
     {
         //
-        $data = [
-            'type_values' => self::getTypeValues(),
-            'status_values' => self::getStatusValues(),
-        ];
-        return view('units.create', $data);
+        $properties = Property::query()
+        ->with('asset')                  // eager load الاسم فقط
+        ->whereHas('asset', fn($q) => $q->where('manager_id', Auth::id()))
+        ->orderBy('city')
+        ->orderBy('neighborhood')
+        ->get();
+
+    return view('units.create', [
+        'type_values'   => self::getTypeValues(),
+        'status_values' => self::getStatusValues(),
+        'properties'    => $properties,
+    ]);
     }
 
     /**
@@ -103,7 +111,7 @@ class UnitController extends Controller
     public function destroy(Unit $unit)
     {
         //
-        if($unit->contracts()->whereIn('status', ['active', 'pending'])->exists()) {
+        if($unit->contract()->whereIn('status', ['active', 'pending'])->exists()) {
             return redirect()->route('units.index')
                     ->with('error', 'لا يمكن حذف الوحدة لوجود عقد نشط مرتبط بها.');
         }

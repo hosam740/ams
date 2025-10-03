@@ -1,102 +1,124 @@
 @extends('layouts.app')
-
-@section('title', 'إضافة وحدة جديدة')
+@section('title','إضافة وحدة')
 
 @section('content')
-<div class="card shadow-sm">
-    <div class="card-header bg-primary text-white">
-        <h5 class="mb-0">إضافة وحدة جديدة</h5>
-    </div>
-    <div class="card-body">
+    {{-- Global errors (collective) --}}
+    @include('components.global-errors')
 
-        {{-- عرض الأخطاء --}}
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+    {{-- Page container --}}
+    <div class="bg-white shadow-1 round-lg p-4 overflow-visible">
+        {{-- Header --}}
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="fw-bold mb-0">
+                <i class="fas fa-plus-circle me-2 text-primary"></i> إضافة وحدة جديدة
+            </h3>
+        </div>
 
-        <form action="{{ route('units.store') }}" method="POST">
+        {{-- =========================================================
+             FORM: Create Unit (alt layout)
+             Maintenance Notes (EN):
+             - Expects: $type_values, $status_values, $properties from controller.
+             - Keep validation rules aligned with Unit::rules().
+             - Use provided arrays for type/status (consistency with model).
+             - Translations: __('unit.types.*'), __('unit.statuses.*') should exist.
+             - To avoid dropdown clipping in RTL, wrapper uses overflow-visible.
+           ========================================================= --}}
+        <form action="{{ route('units.store') }}" method="POST" class="overflow-visible">
             @csrf
 
-            {{-- اسم الوحدة --}}
-            <div class="mb-3">
-                <label for="name" class="form-label">اسم الوحدة</label>
-                <input type="text" name="name" id="name"
-                       class="form-control @error('name') is-invalid @enderror"
-                       value="{{ old('name') }}" required>
-                @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
-            </div>
-            
-            {{-- نوع الوحدة --}}
-            <div class="mb-3">
-                <label for="type" class="form-label">نوع الوحدة</label>
-                <select name="type" id="type" class="form-select @error('type') is-invalid @enderror" required>
-                    <option value="">-- اختر النوع --</option>
-                    @foreach (\App\Models\assets\Unit::getTypeValues() as $value)
-                        <option value="{{ $value }}" {{ old('type') == $value ? 'selected' : '' }}>
-                            {{ ucfirst($value) }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('type') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            <div class="row g-3 overflow-visible">
+                {{-- =================== Relations First =================== --}}
+                {{-- Property (full width, to reduce dropdown clipping issues) --}}
+                <div class="col-12 overflow-visible">
+                    <label for="property_id" class="form-label fw-semibold">العقار</label>
+                    <select id="property_id" name="property_id"
+                            dir="rtl"
+                            style="text-align:right; text-align-last:right; unicode-bidi:plaintext;"
+                            class="form-select @error('property_id') is-invalid @enderror"
+                            required>
+                        <option value="">-- اختر العقار --</option>
+                        @foreach($properties as $property)
+                            {{-- Display: Asset Name — City / Neighborhood --}}
+                            <option value="{{ $property->id }}" @selected(old('property_id') == $property->id)>
+                                {{ $property->asset->name ?? '' }} — {{ $property->city }} / {{ $property->neighborhood }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('property_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    <div class="form-text">اختر العقار أولاً ثم أكمل بقية التفاصيل.</div>
+                </div>
+
+                {{-- =================== Basic Info =================== --}}
+                <div class="col-md-6">
+                    <label for="name" class="form-label fw-semibold">اسم الوحدة</label>
+                    <input id="name" type="text" name="name" value="{{ old('name') }}"
+                           class="form-control @error('name') is-invalid @enderror"
+                           placeholder="أدخل اسم الوحدة" required>
+                    @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+
+                {{-- =================== area =================== --}}
+                <div class="col-md-6">
+                    <label for="area" class="form-label fw-semibold">المساحة (م²)</label>
+                    <input id="area" type="text" step="0.01" min="1" name="area" value="{{ old('area') }}"
+                           class="form-control @error('area') is-invalid @enderror"
+                           placeholder="أدخل المساحة" required>
+                    @error('area') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+
+                {{-- =================== Classification =================== --}}
+                <div class="col-md-6">
+                    <label for="type" class="form-label fw-semibold">نوع الوحدة</label>
+                    <select id="type" name="type" class="form-select @error('type') is-invalid @enderror" required>
+                        <option value="">اختر النوع</option>
+                        @foreach($type_values as $type)
+                            <option value="{{ $type }}" @selected(old('type') == $type)>
+                                {{ __('unit.types.' . $type) }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('type') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+
+                <div class="col-md-6">
+                    <label for="status" class="form-label fw-semibold">الحالة</label>
+                    <select id="status" name="status" class="form-select @error('status') is-invalid @enderror" required>
+                        <option value="">اختر الحالة</option>
+                        @foreach($status_values as $status)
+                            <option value="{{ $status }}" @selected(old('status') == $status)>
+                                {{ __('unit.statuses.' . $status) }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('status') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+
+                {{-- =================== Description =================== --}}
+                <div class="col-12">
+                    <label for="description" class="form-label fw-semibold">الوصف</label>
+                    <textarea id="description" name="description" rows="3"
+                              class="form-control @error('description') is-invalid @enderror"
+                              placeholder="أدخل وصف الوحدة">{{ old('description') }}</textarea>
+                    @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
             </div>
 
-            {{-- الوصف --}}
-            <div class="mb-3">
-                <label for="description" class="form-label">الوصف</label>
-                <textarea name="description" id="description" rows="3"
-                          class="form-control @error('description') is-invalid @enderror"
-                          required>{{ old('description') }}</textarea>
-                @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror
-            </div>
-
-            {{-- المساحة --}}
-            <div class="mb-3">
-                <label for="area" class="form-label">المساحة (م²)</label>
-                <input type="number" name="area" id="area" min="1"
-                       class="form-control @error('area') is-invalid @enderror"
-                       value="{{ old('area') }}" required>
-                @error('area') <div class="invalid-feedback">{{ $message }}</div> @enderror
-            </div>
-
-            {{-- الحالة --}}
-            <div class="mb-3">
-                <label for="status" class="form-label">الحالة</label>
-                <select name="status" id="status" class="form-select @error('status') is-invalid @enderror" required>
-                    <option value="">-- اختر الحالة --</option>
-                    @foreach (\App\Models\assets\Unit::getStatusValues() as $value)
-                        <option value="{{ $value }}" {{ old('status') == $value ? 'selected' : '' }}>
-                            {{ ucfirst($value) }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('status') <div class="invalid-feedback">{{ $message }}</div> @enderror
-            </div>
-
-            {{-- العقار المرتبط --}}
-            <div class="mb-3">
-                <label for="property_id" class="form-label">العقار</label>
-                <select name="property_id" id="property_id" class="form-select @error('property_id') is-invalid @enderror" required>
-                    <option value="">-- اختر العقار --</option>
-                    @foreach (\App\Models\assets\Property::with('asset')->whereHas('asset', fn($q) => $q->where('manager_id', Auth::id()))->get() as $property)
-                        <option value="{{ $property->id }}" {{ old('property_id') == $property->id ? 'selected' : '' }}>
-                            {{ $property->city }} - {{ $property->neighborhood }} ({{ $property->asset->name }})
-                        </option>
-                    @endforeach
-                </select>
-                @error('property_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
-            </div>
-
-            <div class="d-flex justify-content-between">
-                <a href="{{ route('units.index') }}" class="btn btn-secondary">إلغاء</a>
-                <button type="submit" class="btn btn-success">حفظ</button>
+            {{-- Actions --}}
+            <div class="mt-4 text-end">
+                <a href="{{ route('units.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-times me-1"></i> إلغاء
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    حفظ
+                </button>
             </div>
         </form>
+
+        {{-- =================== Extra Maintenance Notes (EN) ===================
+           - The property select is placed first and full-width to minimize native RTL dropdown clipping.
+           - Wrapper uses .overflow-visible to prevent the dropdown from being cut by parent containers.
+           - Keep numeric inputs as type="number" to match validation and mobile keyboards.
+           - If a specific browser still clips the dropdown, consider moving the field near page top or using a custom select only for that case.
+           ================================================================== --}}
     </div>
-</div>
 @endsection

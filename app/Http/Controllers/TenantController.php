@@ -71,10 +71,10 @@ class TenantController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Tenants $tenants)
+    public function edit(Tenants $tenant)
     {
         //
-        return view('tenants.edit', compact('tenants'));
+        return view('tenants.edit', compact('tenant'));
     }
 
     /**

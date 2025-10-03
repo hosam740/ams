@@ -51,12 +51,12 @@ class UpdateUnitRequest extends FormRequest
         ];
     }
 
-    protected static function typeValues(): array
+    protected static function getTypeValues(): array
     {
         return Unit::getTypeValues();
     }
 
-    protected static function statusValues(): array
+    protected static function getStatusValues(): array
     {
         return Unit::getStatusValues();
     }

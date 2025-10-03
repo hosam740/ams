@@ -56,7 +56,7 @@
                                 <td>{{ $unit->name ?? '—' }}</td>
 
                                 {{-- Unit type (capitalize for consistent look) --}}
-                                <td class="text-capitalize">{{ $unit->type ?? '—' }}</td>
+                                <td class="text-capitalize">{{ __('unit.types.' . $unit->type) }}</td>
 
                                 {{-- Status as Bootstrap badge, mapped to semantic colors --}}
                                 <td>
@@ -71,7 +71,7 @@
                                         ];
                                         $badge = $statusMap[$status] ?? 'info';
                                     @endphp
-                                    <span class="badge bg-{{ $badge }}">{{ __($status) }}</span>
+                                    <span class="badge bg-{{ $badge }}">{{ __('unit.statuses.' . $status) }}</span>
                                 </td>
 
                                 {{-- Area in square meters, formatted (fallback if null) --}}
