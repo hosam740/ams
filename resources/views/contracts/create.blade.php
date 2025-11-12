@@ -29,7 +29,7 @@
                     <option value="">-- اختر المستأجر --</option>
                     @foreach (\App\Models\Tenant::orderBy('first_name')->orderBy('last_name')->get() as $tenant)
                         <option value="{{ $tenant->id }}" {{ old('tenant_id') == $tenant->id ? 'selected' : '' }}>
-                            {{ $tenant->first_name }} {{ $tenant->last_name }} — {{ $tenant->national_id }}
+                            <bdi>{{ $tenant->first_name }} {{ $tenant->last_name }}</bdi> — <bdi>{{ $tenant->national_id }}</bdi>
                         </option>
                     @endforeach
                 </select>
