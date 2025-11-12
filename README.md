@@ -22,7 +22,7 @@ The system uses a flexible polymorphic architecture that allows it to manage dif
 
 ## Core Entities
 
-Users
+Users 
 System users with two primary roles:
 
 Managers: Property owners with full control over their assets
