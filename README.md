@@ -7,27 +7,64 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## The Asset Management System (AMS) is designed to streamline property management operations. It provides property managers with tools to manage their real estate portfolio, track rental units, handle tenant relationships, and automate contract and payment workflows.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Project Overview
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+The system uses a flexible polymorphic architecture that allows it to manage different asset types (currently focused on real estate properties, with the ability to expand to stocks, vehicles, etc.).
 
-## Learning Laravel
+## Core Entities
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Users
+System users with two primary roles:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Managers: Property owners with full control over their assets
+Agents: Assigned representatives with limited access to specific properties
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Assets (Polymorphic)
+A flexible parent entity that can represent any asset type. Currently implemented for:
+
+Real estate properties
+Future-ready for stocks, vehicles, or other asset types
+
+Properties
+Real estate holdings with location tracking:
+
+Country, City, Neighborhood hierarchy
+Geographic coordinates support
+Total area measurement
+Contains multiple rental units
+
+Units
+Individual rentable or sellable spaces within properties:
+
+Types: Villa, Apartment, Office, Warehouse, Store
+Status: Available, Rented, Sold, Under Maintenance
+Detailed specifications (area, description)
+
+Tenants
+Individuals or entities renting units:
+
+Personal information and documentation
+National ID and contact details
+Multiple contract history per tenant
+
+Contracts
+Rental agreements between managers and tenants:
+
+Date range management (start, end, termination)
+Payment plan configuration (monthly, quarterly, semiannual, annual)
+Status: Pending, Active, Expired, Terminated
+Automatic payment schedule generation
+
+Payments
+Individual payment installments for each contract:
+
+Sequential numbering per contract
+Due dates and actual payment tracking
+Status: Pending, Paid, Overdue, Cancelled
+Amount tracking (expected vs. actual)
 
 ## Laravel Sponsors
 
