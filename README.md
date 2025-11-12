@@ -3,16 +3,16 @@
 
 
 
-## Asset Management System (AMS)
+<!-- ## Asset Management System (AMS)
 
 A Laravel-based web application for real estate property management, rental tracking, and automated payment processing.
 
----
+--- -->
 
 ## Project Overview
 
 The **Asset Management System (AMS)** is designed to streamline property management operations.  
-It provides property managers with tools to:
+It provides property managers with the tools to:
 
 - Manage their real estate portfolio.  
 - Track rental units.  
