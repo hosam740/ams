@@ -42,22 +42,13 @@ class UnitController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Property $property)
     {
-        //
-        $properties = Property::query()
-        ->with('asset')                  // eager load الاسم فقط
-        ->whereHas('asset', fn($q) => $q->where('manager_id', Auth::id()))
-        ->orderBy('city')
-        ->orderBy('neighborhood')
-        ->get();
+        $property->load('asset');  // Eager load asset relationship
 
-    return view('units.create', [
-        'type_values'   => self::getTypeValues(),
-        'status_values' => self::getStatusValues(),
-        'properties'    => $properties,
-    ]);
+        return view('units.create', compact('property'));
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -112,11 +103,11 @@ class UnitController extends Controller
     {
         //
         if($unit->contract()->whereIn('status', ['active', 'pending'])->exists()) {
-            return redirect()->route('units.index')
+            return redirect()->back()
                     ->with('error', 'لا يمكن حذف الوحدة لوجود عقد نشط مرتبط بها.');
         }
         $unit->delete();
 
-        return redirect()->route('units.index')->with('success', 'تم حذف الوحدة بنجاح');
+        return redirect()->back()->with('success', 'تم حذف الوحدة بنجاح');
     }
 }

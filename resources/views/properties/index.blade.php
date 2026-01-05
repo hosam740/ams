@@ -27,12 +27,14 @@
                             <th>الحي</th>
                             <th>المساحة</th>
                             <th>الحالة</th>
-                            <th class="text-center" style="width: 180px;">الإجراءات</th>
+                            <th class="text-center" style="width: 180px;">الوحدات / المتاح للتأجير</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($properties as $property)
-                            <tr>
+                            <tr role="button"
+                                style="cursor: pointer;"
+                                onclick="window.location='{{ route('properties.show', $property) }}'">
                                 <td>{{ optional($property->asset)->name ?? '—' }}</td>
                                 <td>{{ $property->country ?? '—' }}</td>
                                 <td>{{ $property->city ?? '—' }}</td>
@@ -52,23 +54,7 @@
                                     <span class="badge bg-{{ $color }}">{{ __($status) }}</span>
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ route('properties.show', $property) }}"
-                                       class="btn btn-sm btn-outline-info me-1" title="عرض">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="{{ route('properties.edit', $property) }}"
-                                       class="btn btn-sm btn-outline-primary me-1" title="تعديل">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <form action="{{ route('properties.destroy', $property) }}" method="POST"
-                                          class="d-inline"
-                                          onsubmit="return confirm('هل أنت متأكد من الحذف؟');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="حذف">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+                                    {{ $property->units_count ?? 0 }} / {{ $property->units_available_count ?? 0 }}
                                 </td>
                             </tr>
                         @endforeach

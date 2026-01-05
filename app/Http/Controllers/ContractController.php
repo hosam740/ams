@@ -53,7 +53,7 @@ class ContractController extends Controller
     {
         //
         $data = $request->validated();
-        $data['status'] = $this->getContractStatus($data);
+        $data['status'] = self::getContractStatus($data);
 
         // contract model may throwes an error when vaiolating some rules
         try {
@@ -124,7 +124,7 @@ class ContractController extends Controller
                 ->where('status', 'pending')
                 ->whereDate('due_date', '>', now())
                 ->update([
-                    'status'      => 'canceled'
+                    'status'      => 'cancelled'
                 ]);
         
             $contract->delete();

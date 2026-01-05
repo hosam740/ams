@@ -101,41 +101,9 @@
                                 {{-- Status --}}
                                 <td>
                                     @php
-                                        if (isset($contract->active)) {
-                                            $statusKey = $contract->active ? 'active' : 'inactive';
-                                        } else {
-                                            $today = \Carbon\Carbon::today();
-                                            $begin = \Carbon\Carbon::parse($contract->beginning_date);
-                                            $end   = \Carbon\Carbon::parse($contract->end_date);
-                                            $endedAt = $contract->ended_at ? \Carbon\Carbon::parse($contract->ended_at) : null;
-
-                                            if ($endedAt && $endedAt->lte($today)) {
-                                                $statusKey = 'ended';
-                                            } elseif ($today->lt($begin)) {
-                                                $statusKey = 'not_started';
-                                            } elseif ($today->between($begin, $end)) {
-                                                $statusKey = 'active';
-                                            } else {
-                                                $statusKey = 'ended';
-                                            }
-                                        }
-
-                                        $labels = [
-                                            'active'      => 'ساري',
-                                            'inactive'    => 'متوقف',
-                                            'not_started' => 'لم يبدأ',
-                                            'ended'       => 'منتهي',
-                                        ];
-
-                                        $badges = [
-                                            'active'      => 'success',
-                                            'inactive'    => 'secondary',
-                                            'not_started' => 'warning',
-                                            'ended'       => 'danger',
-                                        ];
-
-                                        $label = $labels[$statusKey] ?? '—';
-                                        $badge = $badges[$statusKey] ?? 'secondary';
+                                        $statusKey = $contract->status;
+                                        $label = __('contract.statuses.' . $statusKey) ?? $statusKey;
+                                        $badge = __('contract.badges.' . $statusKey) ?? 'secondary';
                                     @endphp
 
                                     <span class="badge bg-{{ $badge }}">{{ $label }}</span>

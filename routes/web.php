@@ -5,6 +5,7 @@ use App\Http\Controllers\AssetController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\TenantController;
 use App\Http\Controllers\UnitController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Authentication\AuthController;
 
 use Illuminate\Support\Facades\Route;
@@ -30,5 +31,19 @@ Route::middleware('auth')->group(function() {
     Route::resource('properties', PropertyController::class)->names('properties');
     Route::resource('contracts', ContractController::class)->names('contracts');
     Route::resource('tenants', TenantController::class)->names('tenants');
-    Route::resource('units', UnitController::class)->names('units');
+    
+        /*
+    | Units belong to Properties
+    | - Units must be created within a specific Property context
+    | - Avoids using query strings like ?property_id
+    | - Keeps URLs RESTful and meaningful
+    |
+    | Example:
+    |   /properties/3/units/create
+    */
+    Route::resource('properties.units', UnitController::class)
+        ->shallow() // After creation, access units directly (e.g. /units/{unit}/edit)
+        ->names('units');
+
+    Route::resource('payments', PaymentController::class)->names('payments');
 });

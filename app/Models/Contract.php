@@ -18,7 +18,7 @@ class Contract extends Model
     use SoftDeletes;
     use PaymentGenerationOptimized;
 
-    protected $fillable = ['tenant_id', 'beginning_date', 'end_date', 'total_amount', 'payment_plan', 'active', 'ended_at', 'unit_id'];
+    protected $fillable = ['tenant_id', 'beginning_date', 'end_date', 'total_amount', 'payment_plan', 'status', 'ended_at', 'unit_id'];
 
 
     private static $contract_status_values =  ['pending', 'active', 'expired', 'terminated'];
@@ -92,7 +92,7 @@ class Contract extends Model
 
         static::saved(function ($contract) {
             // توليد عند الإنشاء الأول فقط إذا كان Active
-            if ($contract->wasRecentlyCreated && $contract->active) {
+            if ($contract->wasRecentlyCreated && in_array($contract->status, ['active', 'pending'], true)) {
                 $contract->generatePayments();
                 return;
             }
@@ -100,6 +100,19 @@ class Contract extends Model
             // إعادة توليد عند تغيّر الحقول المؤثرة
             if ($contract->active && $contract->wasChanged(['beginning_date', 'end_date', 'total_amount', 'payment_plan'])) {
                 $contract->regeneratePayments();
+            }
+
+            if (! $contract->unit_id) {
+                return;
+            }
+
+            if (in_array($contract->status, ['active', 'pending'], true)) {
+                $contract->unit()->update(['status' => 'rented']);
+                return;
+            }
+
+            if (in_array($contract->status, ['terminated', 'expired'], true)) {
+                $contract->unit()->update(['status' => 'available']);
             }
         });
     }

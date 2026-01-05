@@ -5,6 +5,11 @@
     {{-- Global errors (collective) --}}
     @include('components.global-errors')
 
+    @php
+        $type_values = \App\Models\assets\Unit::getTypeValues();
+        $status_values = \App\Models\assets\Unit::getStatusValues();
+    @endphp
+
     {{-- Page container --}}
     <div class="bg-white shadow-1 round-lg p-4 overflow-visible">
         {{-- Header --}}
@@ -23,29 +28,21 @@
              - Translations: __('unit.types.*'), __('unit.statuses.*') should exist.
              - To avoid dropdown clipping in RTL, wrapper uses overflow-visible.
            ========================================================= --}}
-        <form action="{{ route('units.store') }}" method="POST" class="overflow-visible">
+        <form action="{{ route('units.store', $property) }}" method="POST" class="overflow-visible">
             @csrf
 
             <div class="row g-3 overflow-visible">
                 {{-- =================== Relations First =================== --}}
-                {{-- Property (full width, to reduce dropdown clipping issues) --}}
+                {{-- Property context (fixed) --}}
                 <div class="col-12 overflow-visible">
-                    <label for="property_id" class="form-label fw-semibold">العقار</label>
-                    <select id="property_id" name="property_id"
-                            dir="rtl"
-                            style="text-align:right; text-align-last:right; unicode-bidi:plaintext;"
-                            class="form-select @error('property_id') is-invalid @enderror"
-                            required>
-                        <option value="">-- اختر العقار --</option>
-                        @foreach($properties as $property)
-                            {{-- Display: Asset Name — City / Neighborhood --}}
-                            <option value="{{ $property->id }}" @selected(old('property_id') == $property->id)>
-                                {{ $property->asset->name ?? '' }} — {{ $property->city }} / {{ $property->neighborhood }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('property_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                    <div class="form-text">اختر العقار أولاً ثم أكمل بقية التفاصيل.</div>
+                    <div class="border rounded-3 p-3 bg-light">
+                        <div class="fw-semibold mb-1">العقار</div>
+                        <div class="text-muted small">
+                            {{ $property->asset->name ?? '—' }} — {{ $property->city ?? '—' }} / {{ $property->neighborhood ?? '—' }}
+                        </div>
+                    </div>
+                    <input type="hidden" name="property_id" value="{{ $property->id }}">
+                    @error('property_id') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                 </div>
 
                 {{-- =================== Basic Info =================== --}}
@@ -105,7 +102,7 @@
 
             {{-- Actions --}}
             <div class="mt-4 text-end">
-                <a href="{{ route('units.index') }}" class="btn btn-secondary">
+                <a href="{{ route('properties.show', $property) }}" class="btn btn-secondary">
                     <i class="fas fa-times me-1"></i> إلغاء
                 </a>
                 <button type="submit" class="btn btn-primary">

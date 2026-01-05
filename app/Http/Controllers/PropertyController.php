@@ -53,7 +53,14 @@ class PropertyController extends Controller
         $properties = Property::query()
                 ->whereHas('asset', function ($q) {
                     $q->where('manager_id', Auth::id());})
-                    ->with(['asset'])->get();
+                    ->with(['asset'])
+                    ->withCount([
+                        'units',
+                        'units as units_available_count' => function ($query) {
+                            $query->where('status', 'available');
+                        },
+                    ])
+                    ->get();
 
 
 
@@ -94,6 +101,13 @@ class PropertyController extends Controller
     public function show(Property $property)
     {
         //
+        $property->load([
+            'asset',
+            'units' => function ($query) {
+                $query->orderBy('name');
+            },
+        ]);
+
         return view('properties.show', compact('property'));
     }
 

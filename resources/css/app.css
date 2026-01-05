@@ -137,8 +137,6 @@ select.form-select option {
 }
 
 
-
-
 /* Responsive Sidebar سلوك الجوال */
 @media (max-width: 992px){
   .sidebar{ transform: translateX(100%); width: min(86vw, var(--sidebar-w)); }
