@@ -6,6 +6,7 @@ use App\Models\assets\Unit;
 use App\Models\assets\Property;
 use App\Http\Requests\Units\StoreUnitRequest;
 use App\Http\Requests\Units\UpdateUnitRequest;
+use App\Services\Contract\ContractService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
@@ -66,10 +67,24 @@ class UnitController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Unit $unit)
+    public function show(Unit $unit, ContractService $contractService)
     {
-        //
-        return view('units.show', compact('unit'));
+        // Load relationships needed for the show page
+        $unit->load([
+            'property.asset',                               // Parent property and its asset
+            'contracts' => function ($query) {
+                $query->with('tenant')                      // Load tenant for each contract
+                      ->orderBy('beginning_date', 'desc');  // Sort by date (newest first)
+            }
+        ]);
+
+        // Get the primary contract to display (active > pending > latest)
+        $primaryContract = $contractService->getPrimaryContract($unit);
+
+        // Get all other contracts for history (exclude the primary one)
+        $otherContracts = $contractService->getOtherContracts($unit, $primaryContract);
+
+        return view('units.show', compact('unit', 'primaryContract', 'otherContracts'));
     }
 
     /**
@@ -99,13 +114,14 @@ class UnitController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Unit $unit)
+    public function destroy(Unit $unit, ContractService $contractService)
     {
-        //
-        if($unit->contract()->whereIn('status', ['active', 'pending'])->exists()) {
+        // Check if unit has active or pending contracts
+        if($contractService->hasActiveOrPendingContracts($unit)) {
             return redirect()->back()
                     ->with('error', 'لا يمكن حذف الوحدة لوجود عقد نشط مرتبط بها.');
         }
+
         $unit->delete();
 
         return redirect()->back()->with('success', 'تم حذف الوحدة بنجاح');

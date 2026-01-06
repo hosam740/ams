@@ -6,7 +6,7 @@ use App\Models\Contract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Unit extends Model
 {
@@ -63,10 +63,10 @@ class Unit extends Model
         return $this->belongsTo(Property::class, 'property_id');
     }
 
-    // contract/unit relationship
-    public function contract(): HasOne
+    // contract/unit relationship - one unit can have multiple contracts over time
+    public function contracts(): HasMany
     {
-        return $this->hasOne(Contract::class, 'unit_id');
+        return $this->hasMany(Contract::class, 'unit_id');
     }
 
 }
