@@ -100,11 +100,11 @@ class PropertyController extends Controller
      */
     public function show(Property $property)
     {
-        //
         $property->load([
             'asset',
             'units' => function ($query) {
-                $query->orderBy('name');
+                $query->select('id', 'property_id', 'name', 'type', 'status', 'area')
+                      ->orderBy('name');
             },
         ]);
 

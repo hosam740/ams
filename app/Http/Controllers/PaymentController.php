@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Payment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
 {
@@ -12,7 +13,18 @@ class PaymentController extends Controller
      */
     public function index()
     {
-        $payments = Payment::all();
+        $payments = Payment::query()
+            ->whereHas('contract.unit.property.asset', function ($q) {
+                $q->where('manager_id', Auth::id());
+            })
+            ->with([
+                'contract.unit:id,property_id,name',
+                'contract.unit.property:id,city,neighborhood',
+                'contract.unit.property.asset:id,name',
+                'contract.tenant:id,first_name,last_name,phone_number,email'
+            ])
+            ->latest('due_date')
+            ->get();
 
         return view('payments.index', compact('payments'));
     }

@@ -123,7 +123,7 @@
     </div>
 </div>
 
-{{-- تحسين بسيط: اجعل تاريخ النهاية دائماً بعد البداية --}}
+{{-- تحسين: اجعل تاريخ النهاية دائماً بعد البداية --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const begin = document.getElementById('beginning_date');
@@ -137,8 +137,16 @@ document.addEventListener('DOMContentLoaded', function () {
             end.removeAttribute('min');
         }
     }
+
     begin.addEventListener('change', syncMin);
     syncMin();
 });
 </script>
+
+<style>
+    /* Improve date input appearance */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+    }
+</style>
 @endsection

@@ -22,16 +22,16 @@ class ContractController extends Controller
      */
     public function index()
     {
-
-
-        $contracts = Contract::all();
-
-        // //
-        // $contracts = Contract::where('active', true)
-        //         ->whereRelation('unit.property.asset', 'manager_id', Auth::id())
-        //         ->with('unit.property.asset')
-        //         ->paginate(15);
-
+        $contracts = Contract::query()
+            ->whereHas('unit.property.asset', function ($q) {
+                $q->where('manager_id', Auth::id());
+            })
+            ->with([
+                'unit.property.asset',
+                'tenant:id,first_name,last_name,phone_number,email'
+            ])
+            ->latest('beginning_date')
+            ->get();
 
         return view('contracts.index', compact('contracts'));
     }

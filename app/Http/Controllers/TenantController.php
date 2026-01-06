@@ -15,24 +15,32 @@ class TenantController extends Controller
      */
     public function index()
     {
-
-
-        $tenants = Tenant::all();
-
-        //                  to fech tenants with active contract only 
-        // $tenants = Tenant::whereHas('contracts', function ($q) {
-        //     $q->where('active', true)
-
-        //     // fech tenants with the condition 
-        //       ->whereHas('unit.property.asset', fn($a) => 
-        //           $a->where('manager_id', Auth::id()));
-        // })
-        // //  with tenants fech only active contracts
-        // ->with(['contracts' => function ($q) {
-        //     $q->where('active', true)->with('unit.property.asset');
-        // }])
-        // ->get();
-
+        $tenants = Tenant::query()
+            ->whereHas('contracts.unit.property.asset', function ($q) {
+                $q->where('manager_id', Auth::id());
+            })
+            ->with([
+                'contracts' => function ($q) {
+                    $q->whereHas('unit.property.asset', function ($query) {
+                            $query->where('manager_id', Auth::id());
+                        })
+                        ->with([
+                            'unit:id,property_id,name',
+                            'unit.property:id,city,neighborhood',
+                            'unit.property.asset:id,name'
+                        ])
+                        ->latest('beginning_date');
+                }
+            ])
+            ->withCount([
+                'contracts as active_contracts_count' => function ($q) {
+                    $q->where('status', 'active')
+                      ->whereHas('unit.property.asset', function ($query) {
+                          $query->where('manager_id', Auth::id());
+                      });
+                }
+            ])
+            ->get();
 
         return view('tenants.index', compact('tenants'));
     }

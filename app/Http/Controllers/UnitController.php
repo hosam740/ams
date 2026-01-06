@@ -8,7 +8,6 @@ use App\Http\Requests\Units\StoreUnitRequest;
 use App\Http\Requests\Units\UpdateUnitRequest;
 use App\Services\Contract\ContractService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 
 class UnitController extends Controller
 {
@@ -30,12 +29,17 @@ class UnitController extends Controller
      */
     public function index()
     {
-        //
         $units = Unit::query()
             ->whereHas('property.asset', function ($q) {
-                $q->where('manager_id', Auth::id());})
-                ->with(['property.asset'])->get();
-
+                $q->where('manager_id', Auth::id());
+            })
+            ->with([
+                'property:id,city,neighborhood',
+                'property.asset:id,name'
+            ])
+            ->select('id', 'property_id', 'name', 'type', 'status', 'area')
+            ->latest()
+            ->get();
 
         return view('units.index', compact('units'));
     }
@@ -54,14 +58,14 @@ class UnitController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreUnitRequest $request)
+    public function store(StoreUnitRequest $request, Property $property)
     {
         //
         $validated = $request->validated();
 
         Unit::create($validated);
 
-        return redirect()->route('units.index')->with('success', 'تم إضافة الوحدة بنجاح');
+        return redirect()->route('properties.show', $property)->with('success', 'تم إضافة الوحدة بنجاح');
     }
 
     /**

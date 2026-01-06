@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Asset;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AssetController extends Controller
 {
@@ -12,8 +13,12 @@ class AssetController extends Controller
      */
     public function index()
     {
-        //
-        $assets = Asset::all();
+        $assets = Asset::query()
+            ->where('manager_id', Auth::id())
+            ->with('property:id,asset_id,name,city,neighborhood')
+            ->withCount('users')
+            ->latest()
+            ->get();
 
         return view('assets.index', compact('assets'));
     }
