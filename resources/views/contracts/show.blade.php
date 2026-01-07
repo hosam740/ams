@@ -82,9 +82,9 @@
 
     {{-- Breadcrumb and back button --}}
     <div class="mb-3">
-        <a href="{{ route('contracts.index') }}" class="btn btn-outline-secondary">
+        <a href="{{ url()->previous(route('contracts.index')) }}" class="btn btn-outline-secondary">
             <i class="fas fa-arrow-right me-2"></i>
-            الرجوع
+            رجوع
         </a>
     </div>
 
