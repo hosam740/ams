@@ -73,7 +73,15 @@ class ContractController extends Controller
      */
     public function show(Contract $contract)
     {
-        //
+        // Eager load all required relationships to avoid N+1 queries
+        $contract->load([
+            'tenant:id,first_name,last_name,phone_number,email,national_id,nationality',
+            'unit.property.asset',
+            'payments' => function($query) {
+                $query->orderBy('payment_number', 'asc');
+            }
+        ]);
+
         return view('contracts.show', compact('contract'));
     }
 
