@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Tenant;
 use App\Http\Requests\Tenant\StoreTenantRequest;
 use App\Http\Requests\Tenant\UpdateTenantRequest;
+use App\Services\Contract\ContractService;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -70,10 +71,32 @@ class TenantController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Tenant $tenant)
+    public function show(Tenant $tenant, ContractService $contractService)
     {
-        //
-        return view('tenants.show', compact('tenant'));
+        // Eager load all relationships to avoid N+1 queries
+        $tenant->load([
+            'contracts' => function ($query) {
+                $query->whereHas('unit.property.asset', function ($q) {
+                        $q->where('manager_id', Auth::id());
+                    })
+                    ->with([
+                        'unit:id,property_id,name,type,status',
+                        'unit.property:id,city,neighborhood',
+                        'unit.property.asset:id,name',
+                        'payments' => function ($q) {
+                            $q->orderBy('due_date', 'asc');
+                        }
+                    ])
+                    ->orderBy('beginning_date', 'desc');
+            }
+        ]);
+
+        // Get the primary contract (active > pending > latest)
+        $primaryContract = $tenant->contracts->firstWhere('status', 'active')
+            ?? $tenant->contracts->firstWhere('status', 'pending')
+            ?? $tenant->contracts->first();
+
+        return view('tenants.show', compact('tenant', 'primaryContract'));
     }
 
     /**
