@@ -82,10 +82,7 @@ class TenantController extends Controller
                     ->with([
                         'unit:id,property_id,name,type,status',
                         'unit.property:id,city,neighborhood',
-                        'unit.property.asset:id,name',
-                        'payments' => function ($q) {
-                            $q->orderBy('due_date', 'asc');
-                        }
+                        'unit.property.asset:id,name'
                     ])
                     ->orderBy('beginning_date', 'desc');
             }

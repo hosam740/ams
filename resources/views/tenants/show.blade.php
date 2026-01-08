@@ -61,7 +61,6 @@
             $primaryUnit = $primaryContract->unit;
             $primaryProperty = $primaryUnit?->property;
             $primaryAsset = $primaryProperty?->asset;
-            $primaryPayments = $primaryContract->payments;
 
             $primaryBeginDate = \Carbon\Carbon::parse($primaryContract->beginning_date);
             $primaryEndDate = \Carbon\Carbon::parse($primaryContract->end_date);
@@ -69,9 +68,6 @@
 
             $primaryDurationMonths = $primaryBeginDate->diffInMonths($primaryEndDate);
             $primaryDaysRemaining = $primaryToday->diffInDays($primaryEndDate, false);
-
-            $primaryPaidAmount = $primaryPayments->where('status', 'paid')->sum('paid_amount');
-            $primaryRemainingAmount = $primaryContract->total_amount - $primaryPaidAmount;
 
             $primaryLocationString = trim(($primaryProperty?->city ?? '—') . ' - ' . ($primaryProperty?->neighborhood ?? '—'));
 
@@ -115,40 +111,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
-
-        {{-- Tenant Info Stats Cards --}}
-        <div class="row g-3 mb-4">
-            <div class="col-lg-4 col-md-4">
-                <div class="border rounded-3 p-3 h-100">
-                    <div class="text-muted small mb-1">
-                        <i class="fas fa-file-contract me-1"></i> عدد العقود
-                    </div>
-                    <div class="fw-bold fs-4">
-                        {{ $totalContracts }}
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-4">
-                <div class="border rounded-3 p-3 h-100">
-                    <div class="text-muted small mb-1">
-                        <i class="fas fa-check-circle me-1"></i> العقود النشطة
-                    </div>
-                    <div class="fw-bold fs-4 text-success">
-                        {{ $activeContracts }}
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-4">
-                <div class="border rounded-3 p-3 h-100">
-                    <div class="text-muted small mb-1">
-                        <i class="fas fa-door-open me-1"></i> عدد الوحدات المستأجرة
-                    </div>
-                    <div class="fw-bold fs-4">
-                        {{ $uniqueUnits }}
-                    </div>
-                </div>
-            </div>
-        </div>
 
         {{-- Main content: Tenant Details + Primary Contract --}}
         <div class="row g-4 mb-4">
@@ -206,6 +168,26 @@
                                 @else
                                     —
                                 @endif
+                            </div>
+                        </div>
+
+                        {{-- Statistics Section --}}
+                        <div class="col-12 mt-3 pt-3 border-top">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="text-muted small">عدد العقود</div>
+                                    <div class="fw-semibold">
+                                        <i class="fas fa-file-contract me-1 text-primary"></i>
+                                        {{ $totalContracts }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-muted small">العقود النشطة</div>
+                                    <div class="fw-semibold">
+                                        <i class="fas fa-check-circle me-1 text-success"></i>
+                                        {{ $activeContracts }}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -307,13 +289,13 @@
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th>الوحدة</th>
-                            <th>العقار</th>
-                            <th>الموقع</th>
-                            <th>تاريخ البداية</th>
-                            <th>تاريخ النهاية</th>
-                            <th>المبلغ الإجمالي</th>
-                            <th>الحالة</th>
+                            <th style="width: 15%;">الوحدة</th>
+                            <th style="width: 15%;">العقار</th>
+                            <th style="width: 15%;">الموقع</th>
+                            <th style="width: 15%;">تاريخ البداية</th>
+                            <th style="width: 15%;">تاريخ النهاية</th>
+                            <th style="width: 15%;">المبلغ الإجمالي</th>
+                            <th style="width: 10%;">الحالة</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -333,39 +315,35 @@
                             @endphp
                             <tr>
                                 <td colspan="7" class="p-0">
-                                    <a href="{{ route('contracts.show', $contract) }}" class="text-decoration-none text-dark d-block">
-                                        <table class="w-100 m-0">
-                                            <tr>
-                                                <td style="width: 14.28%; padding: 0.5rem;">
-                                                    <div class="fw-semibold">{{ $unit?->name ?? '—' }}</div>
-                                                    <div class="text-muted small">
-                                                        {{ __('unit.types.' . $unit?->type) ?? '—' }}
-                                                    </div>
-                                                </td>
-                                                <td style="width: 14.28%; padding: 0.5rem;" class="fw-semibold">
-                                                    {{ $asset?->name ?? '—' }}
-                                                </td>
-                                                <td style="width: 14.28%; padding: 0.5rem;">
-                                                    <div class="text-muted small">{{ $locationString }}</div>
-                                                </td>
-                                                <td style="width: 14.28%; padding: 0.5rem;">
-                                                    <div>{{ $beginDate->format('Y-m-d') }}</div>
-                                                    <div class="text-muted small">{{ $beginDate->format('M Y') }}</div>
-                                                </td>
-                                                <td style="width: 14.28%; padding: 0.5rem;">
-                                                    <div>{{ $endDate->format('Y-m-d') }}</div>
-                                                    <div class="text-muted small">{{ $endDate->format('M Y') }}</div>
-                                                </td>
-                                                <td style="width: 14.28%; padding: 0.5rem;" class="fw-semibold">
-                                                    {{ number_format($contract->total_amount, 2) }} ر.س
-                                                </td>
-                                                <td style="width: 14.28%; padding: 0.5rem;">
-                                                    <span class="badge bg-{{ $statusBadge }}">
-                                                        {{ $statusLabel }}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        </table>
+                                    <a href="{{ route('contracts.show', $contract) }}" class="text-decoration-none text-dark d-flex" style="padding: 0.5rem;">
+                                        <div style="width: 15%;">
+                                            <div class="fw-semibold">{{ $unit?->name ?? '—' }}</div>
+                                            <div class="text-muted small">
+                                                {{ __('unit.types.' . $unit?->type) ?? '—' }}
+                                            </div>
+                                        </div>
+                                        <div style="width: 15%;" class="fw-semibold">
+                                            {{ $asset?->name ?? '—' }}
+                                        </div>
+                                        <div style="width: 15%;">
+                                            <div class="text-muted small">{{ $locationString }}</div>
+                                        </div>
+                                        <div style="width: 15%;">
+                                            <div>{{ $beginDate->format('Y-m-d') }}</div>
+                                            <div class="text-muted small">{{ $beginDate->format('M Y') }}</div>
+                                        </div>
+                                        <div style="width: 15%;">
+                                            <div>{{ $endDate->format('Y-m-d') }}</div>
+                                            <div class="text-muted small">{{ $endDate->format('M Y') }}</div>
+                                        </div>
+                                        <div style="width: 15%;" class="fw-semibold">
+                                            {{ number_format($contract->total_amount, 2) }} ر.س
+                                        </div>
+                                        <div style="width: 10%;">
+                                            <span class="badge bg-{{ $statusBadge }}">
+                                                {{ $statusLabel }}
+                                            </span>
+                                        </div>
                                     </a>
                                 </td>
                             </tr>

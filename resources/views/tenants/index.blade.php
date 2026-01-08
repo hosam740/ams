@@ -35,43 +35,28 @@
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th>#</th>
-                            <th>الاسم</th>
-                            <th class="text-nowrap">رقم الهوية/الإقامة</th>
-                            <th class="text-nowrap">رقم الجوال</th>
-                            <th>الجنسية</th>
-                            <th class="text-center" style="width: 220px;">إجراءات</th>
+                            <th style="width: 5%;">#</th>
+                            <th style="width: 20%;">الاسم</th>
+                            <th style="width: 15%;">رقم الهوية/الإقامة</th>
+                            <th style="width: 15%;">رقم الجوال</th>
+                            <th style="width: 30%;">البريد الإلكتروني</th>
+                            <th style="width: 15%;">الجنسية</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($tenants as $i => $tenant)
                             <tr>
-                                <td>{{ $i + 1 }}</td>
-                                <td>{{ trim(($tenant->first_name ?? '').' '.($tenant->last_name ?? '')) ?: '—' }}</td>
-                                <td>{{ $tenant->national_id ?? '—' }}</td>
-                                <td>{{ $tenant->phone_number ?? '—' }}</td>
-                                <td class="text-capitalize">{{ $tenant->nationality ?? '—' }}</td>
-                                <td class="text-center">
-                                    {{-- View --}}
-                                    <a href="{{ route('tenants.show', $tenant) }}"
-                                       class="btn btn-sm btn-outline-info me-1" title="عرض">
-                                        <i class="fas fa-eye"></i>
+                                <td colspan="6" class="p-0">
+                                    <a href="{{ route('tenants.show', $tenant) }}" class="text-decoration-none text-dark d-flex align-items-center" style="padding: 0.5rem;">
+                                        <div style="width: 5%;">{{ $i + 1 }}</div>
+                                        <div style="width: 20%;" class="fw-semibold">
+                                            {{ trim(($tenant->first_name ?? '').' '.($tenant->last_name ?? '')) ?: '—' }}
+                                        </div>
+                                        <div style="width: 15%;">{{ $tenant->national_id ?? '—' }}</div>
+                                        <div style="width: 15%;">{{ $tenant->phone_number ?? '—' }}</div>
+                                        <div style="width: 30%;" class="text-muted small">{{ $tenant->email ?? '—' }}</div>
+                                        <div style="width: 15%;" class="text-capitalize">{{ $tenant->nationality ?? '—' }}</div>
                                     </a>
-                                    {{-- Edit --}}
-                                    <a href="{{ route('tenants.edit', $tenant) }}"
-                                       class="btn btn-sm btn-outline-primary me-1" title="تعديل">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    {{-- Delete --}}
-                                    <form action="{{ route('tenants.destroy', $tenant) }}"
-                                          method="POST" class="d-inline"
-                                          onsubmit="return confirm('هل أنت متأكد من حذف هذا المستأجر؟');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="حذف">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
                                 </td>
                             </tr>
                         @endforeach
