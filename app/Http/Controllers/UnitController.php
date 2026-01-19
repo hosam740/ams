@@ -112,7 +112,7 @@ class UnitController extends Controller
 
         $unit->update($validated);
 
-        return redirect()->route('units.index')->with('success', 'تم تحديث الوحدة بنجاح');
+        return redirect()->route('units.show', $unit)->with('success', 'تم تحديث الوحدة بنجاح');
     }
 
     /**

@@ -45,12 +45,11 @@
                             <th>خطة الدفع</th>
                             <th>عدد الدفعات</th>
                             <th>الحالة</th>
-                            <th class="text-center" style="width: 220px;">إجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($contracts as $i => $contract)
-                            <tr>
+                            <tr style="cursor: pointer;" onclick="window.location='{{ route('contracts.show', $contract) }}'">
                                 <td>{{ $i + 1 }}</td>
 
                                 {{-- Tenant --}}
@@ -107,30 +106,6 @@
                                     @endphp
 
                                     <span class="badge bg-{{ $badge }}">{{ $label }}</span>
-                                </td>
-
-                                {{-- Actions --}}
-                                <td class="text-center">
-                                    {{-- View --}}
-                                    <a href="{{ route('contracts.show', $contract) }}"
-                                       class="btn btn-sm btn-outline-info me-1" title="عرض">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    {{-- Edit --}}
-                                    <a href="{{ route('contracts.edit', $contract) }}"
-                                       class="btn btn-sm btn-outline-primary me-1" title="تعديل">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    {{-- Delete --}}
-                                    <form action="{{ route('contracts.destroy', $contract) }}"
-                                          method="POST" class="d-inline"
-                                          onsubmit="return confirm('هل أنت متأكد من حذف هذا العقد؟');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="حذف">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
                                 </td>
                             </tr>
                         @endforeach

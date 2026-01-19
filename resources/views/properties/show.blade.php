@@ -146,12 +146,11 @@
                             <th>النوع</th>
                             <th>الحالة</th>
                             <th class="text-nowrap">المساحة</th>
-                            <th class="text-center" style="width: 180px;">الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($units as $i => $unit)
-                            <tr>
+                            <tr style="cursor: pointer;" onclick="window.location='{{ route('units.show', $unit) }}'">
                                 <td>{{ $i + 1 }}</td>
                                 <td>{{ $unit->name ?? '—' }}</td>
                                 <td class="text-capitalize">
@@ -174,25 +173,6 @@
                                 </td>
                                 <td>
                                     {{ is_numeric($unit->area ?? null) ? number_format($unit->area) . ' م²' : '—' }}
-                                </td>
-                                <td class="text-center">
-                                    <a href="{{ route('units.show', $unit) }}"
-                                       class="btn btn-sm btn-outline-info me-1" title="عرض">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="{{ route('units.edit', $unit) }}"
-                                       class="btn btn-sm btn-outline-primary me-1" title="تعديل">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <form action="{{ route('units.destroy', $unit) }}" method="POST"
-                                          class="d-inline"
-                                          onsubmit="return confirm('هل أنت متأكد من حذف هذه الوحدة؟');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="حذف">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
                                 </td>
                             </tr>
                         @endforeach

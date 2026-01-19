@@ -91,7 +91,7 @@
 
             {{-- Submit --}}
             <div class="mt-4 d-flex gap-2 justify-content-end">
-                <a href="{{ route('units.index') }}" class="btn btn-secondary">
+                <a href="{{ route('units.show', $unit) }}" class="btn btn-secondary">
                     <i class="fas fa-times me-1"></i> إلغاء
                 </a>
                 <button type="submit" class="btn btn-primary">
