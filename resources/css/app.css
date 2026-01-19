@@ -36,12 +36,6 @@
 .brand-txt{ display: flex; flex-direction: column; }
 .brand-name{ font-weight: 800; letter-spacing: .2px; }
 .brand-sub{ font-size: .8rem; opacity: .75; }
-.pin-btn{
-  margin-right: auto; border: 1px solid rgba(255,255,255,.14);
-  color: #fff; background: transparent;
-  padding: 8px 10px; border-radius: 10px; transition: var(--trans);
-}
-.pin-btn:hover{ background: rgba(255,255,255,.08); }
 
 .nav-scroll{ overflow-y: auto; padding: 10px 10px 14px; flex: 1; }
 .side-link{

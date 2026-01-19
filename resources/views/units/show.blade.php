@@ -83,52 +83,6 @@
             </div>
         @endif
 
-        {{-- Stats row: Quick info cards --}}
-        <div class="row g-3 mb-4">
-            <div class="col-md-3 col-6">
-                <div class="border rounded-3 p-3 h-100">
-                    <div class="text-muted small mb-1">
-                        <i class="fas fa-tag me-1"></i> النوع
-                    </div>
-                    <div class="fw-bold fs-5">
-                        {{ __('unit.types.' . $unit->type) }}
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="border rounded-3 p-3 h-100">
-                    <div class="text-muted small mb-1">
-                        <i class="fas fa-ruler-combined me-1"></i> المساحة
-                    </div>
-                    <div class="fw-bold fs-5">
-                        {{ is_numeric($unit->area) ? number_format($unit->area) . ' م²' : '—' }}
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="border rounded-3 p-3 h-100">
-                    <div class="text-muted small mb-1">
-                        <i class="fas fa-info-circle me-1"></i> الحالة
-                    </div>
-                    <div class="fw-bold fs-5">
-                        <span class="badge bg-{{ $statusBadge }}">
-                            {{ __('unit.statuses.' . $unit->status) }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="border rounded-3 p-3 h-100">
-                    <div class="text-muted small mb-1">
-                        <i class="fas fa-calendar me-1"></i> آخر تحديث
-                    </div>
-                    <div class="fw-bold fs-6">
-                        {{ $unit->updated_at?->diffForHumans() ?? '—' }}
-                    </div>
-                </div>
-            </div>
-        </div>
-
         {{-- Main content: Unit details + Contract --}}
         <div class="row g-4">
             {{-- Left column: Unit details --}}
@@ -157,13 +111,18 @@
                             </div>
                         </div>
 
-                        <div class="col-12">
+                        <div class="col-md-6">
                             <div class="text-muted small">الحالة</div>
                             <div>
                                 <span class="badge bg-{{ $statusBadge }}">
                                     {{ __('unit.statuses.' . $unit->status) }}
                                 </span>
                             </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="text-muted small">آخر تحديث</div>
+                            <div class="fw-semibold">{{ $unit->updated_at?->diffForHumans() ?? '—' }}</div>
                         </div>
 
                         @if($unit->description)
@@ -259,37 +218,27 @@
                                 </div>
                             </div>
 
-                            @if($daysRemaining > 0 && $primaryContract->status === 'active')
-                            <div class="col-12">
-                                <div class="alert alert-info mb-0">
-                                    <i class="fas fa-clock me-1"></i>
-                                    متبقي <strong>{{ $daysRemaining }}</strong> يوم على انتهاء العقد
-                                </div>
-                            </div>
-                            @elseif($daysRemaining <= 0 && $primaryContract->status === 'active')
-                            <div class="col-12">
-                                <div class="alert alert-warning mb-0">
-                                    <i class="fas fa-exclamation-triangle me-1"></i>
-                                    العقد منتهي منذ <strong>{{ abs($daysRemaining) }}</strong> يوم
-                                </div>
+                            @if($primaryContract->status === 'active')
+                            <div class="col-md-6">
+                                <div class="text-muted small">الأيام المتبقية</div>
+                                @if($daysRemaining > 0)
+                                    <div class="fw-semibold">
+                                        {{ $daysRemaining }} يوم
+                                    </div>
+                                @else
+                                    <div class="fw-semibold text-danger">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                        منتهي منذ {{ abs($daysRemaining) }} يوم
+                                    </div>
+                                @endif
                             </div>
                             @endif
 
                             <div class="col-12 mt-3 pt-3 border-top">
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <a href="{{ route('contracts.show', $primaryContract) }}"
-                                       class="btn btn-outline-info btn-sm">
-                                        <i class="fas fa-eye me-1"></i> عرض العقد
-                                    </a>
-                                    <a href="{{ route('contracts.edit', $primaryContract) }}"
-                                       class="btn btn-outline-primary btn-sm">
-                                        <i class="fas fa-edit me-1"></i> تعديل العقد
-                                    </a>
-                                    <a href="{{ route('payments.index') }}"
-                                       class="btn btn-outline-success btn-sm">
-                                        <i class="fas fa-money-bill-wave me-1"></i> الدفعات
-                                    </a>
-                                </div>
+                                <a href="{{ route('contracts.show', $primaryContract) }}"
+                                   class="btn btn-primary btn-sm w-100">
+                                    <i class="fas me-1"></i> تفاصيل العقد
+                                </a>
                             </div>
                         </div>
 
@@ -341,7 +290,6 @@
                             <th>المدة</th>
                             <th>المبلغ</th>
                             <th>الحالة</th>
-                            <th class="text-center" style="width: 150px;">إجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -355,7 +303,7 @@
                                 $endDate = \Carbon\Carbon::parse($contract->end_date);
                                 $duration = $beginDate->diffInMonths($endDate);
                             @endphp
-                            <tr>
+                            <tr style="cursor: pointer;" onclick="window.location='{{ route("contracts.show", $contract) }}'">
                                 <td>{{ $index + 1 }}</td>
                                 <td>
                                     <div class="fw-semibold">
@@ -385,18 +333,6 @@
                                     <span class="badge bg-{{ $statusBadgeColor }}">
                                         {{ $statusLabel }}
                                     </span>
-                                </td>
-                                <td class="text-center">
-                                    <a href="{{ route('contracts.show', $contract) }}"
-                                       class="btn btn-sm btn-outline-info me-1"
-                                       title="عرض">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="{{ route('contracts.edit', $contract) }}"
-                                       class="btn btn-sm btn-outline-primary"
-                                       title="تعديل">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
                                 </td>
                             </tr>
                         @endforeach

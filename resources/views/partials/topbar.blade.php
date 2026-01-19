@@ -3,23 +3,13 @@
         <button id="burger" class="burger d-inline d-lg-none" aria-label="فتح القائمة">
             <i class="fa-solid fa-bars"></i>
         </button>
-        <div class="search-bar d-none d-sm-block">
-            <i class="fas fa-search"></i>
-            <input type="text" class="form-control" placeholder="ابحث...">
-        </div>
     </div>
 
     <div class="d-flex align-items-center gap-3">
-        <div class="position-relative">
-            <i class="fas fa-bell"></i>
-            <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-danger">3</span>
-        </div>
-
         @auth
             <div class="dropdown">
                 <button class="avatar btn p-0 border-0" data-bs-toggle="dropdown" aria-expanded="false" title="{{ Auth::user()->name }}">
-                    {{-- نفس شكل الأفاتار السابق، حرف م --}}
-                    م
+                    {{ mb_substr(Auth::user()->name, 0, 1) }}
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end shadow">
                     <li class="px-3 py-2">

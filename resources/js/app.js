@@ -5,8 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const main    = document.getElementById('main');
   const topbar  = document.getElementById('topbar'); // NEW: لازم تضيف id="topbar" في التوببار
   const burger  = document.getElementById('burger');
-  const pinBtn  = document.getElementById('pinBtn');
-
   const isDesktop = () => window.innerWidth >= 992;
 
   // فتح/إغلاق على الجوال (لا نلمس الـtopbar هنا)
@@ -17,14 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
       main?.classList?.remove('mini');
       // لا تغييرات على topbar في الجوال
     }
-  });
-
-  // تثبيت/تصغير على الديسكتوب فقط + تحريك topbar معاه
-  pinBtn?.addEventListener('click', () => {
-    if (!isDesktop()) return;
-    const isMini = sidebar.classList.toggle('mini');
-    main?.classList?.toggle('mini', isMini);
-    topbar?.classList?.toggle('mini', isMini); // NEW
   });
 
   // توسعة فورية عند المرور بالماوس على الديسكتوب فقط
