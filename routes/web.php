@@ -46,4 +46,6 @@ Route::middleware('auth')->group(function() {
         ->names('units');
 
     Route::resource('payments', PaymentController::class)->names('payments');
+    Route::patch('payments/{payment}/mark-paid', [PaymentController::class, 'markAsPaid'])->name('payments.mark-paid');
+    Route::patch('payments/{payment}/cancel', [PaymentController::class, 'cancel'])->name('payments.cancel');
 });

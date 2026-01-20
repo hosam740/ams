@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Payment\CancelPaymentRequest;
+use App\Http\Requests\Payment\MarkPaymentAsPaidRequest;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -75,5 +77,35 @@ class PaymentController extends Controller
     public function destroy(Payment $payment)
     {
         //
+    }
+
+    /**
+     * Mark a payment as paid.
+     */
+    public function markAsPaid(MarkPaymentAsPaidRequest $request, Payment $payment)
+    {
+        $payment->update([
+            'status' => 'paid',
+            'paid_amount' => $request->paid_amount,
+            'paid_date' => $request->paid_date,
+            'payment_method' => $request->payment_method,
+            'received_by' => Auth::id(),
+            'notes' => $request->notes ?? $payment->notes,
+        ]);
+
+        return back()->with('success', 'تم تسجيل السداد بنجاح');
+    }
+
+    /**
+     * Cancel a payment.
+     */
+    public function cancel(CancelPaymentRequest $request, Payment $payment)
+    {
+        $payment->update([
+            'status' => 'cancelled',
+            'notes' => $request->notes ?? $payment->notes,
+        ]);
+
+        return back()->with('success', 'تم إلغاء الدفعة بنجاح');
     }
 }
