@@ -30,6 +30,7 @@ Route::middleware('auth')->group(function() {
     Route::resource('assets', AssetController::class)->names('assets');
     Route::resource('properties', PropertyController::class)->names('properties');
     Route::resource('contracts', ContractController::class)->names('contracts');
+    Route::post('contracts/{contract}/terminate', [ContractController::class, 'terminate'])->name('contracts.terminate');
     Route::resource('tenants', TenantController::class)->names('tenants');
     
         /*

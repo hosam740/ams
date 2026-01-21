@@ -99,6 +99,12 @@ class ContractController extends Controller
      */
     public function update(UpdateContractRequest $request, Contract $contract)
     {
+
+    if ($contract->status !== 'pending') {
+        return back()->withErrors([
+            'contract' => 'لا يمكن تعديل عقد ساري او مفسوخ'
+        ]);
+    }
         //
         $data = $request->validated();
 
@@ -113,6 +119,31 @@ class ContractController extends Controller
         }
 
         return redirect()->route('contracts.index')->with('success', 'تم تحديث العقد بنجاح');
+    }
+
+    /**
+     * Terminate an active contract.
+     */
+    public function terminate(Contract $contract)
+    {
+        if ($contract->status !== 'active') {
+            return back()->withErrors([
+                'contract' => 'لا يمكن فسخ عقد غير نشط'
+            ]);
+        }
+
+        $contract->update([
+            'status'   => 'terminated',
+            'ended_at' => now(),
+        ]);
+
+        // Cancel pending payments
+        $contract->payments()
+            ->where('status', 'pending')
+            ->update(['status' => 'cancelled']);
+
+        return redirect()->route('contracts.index')
+            ->with('success', 'تم فسخ العقد بنجاح');
     }
 
     /**

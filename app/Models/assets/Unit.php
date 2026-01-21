@@ -69,4 +69,39 @@ class Unit extends Model
         return $this->hasMany(Contract::class, 'unit_id');
     }
 
+
+
+    /**
+     * Refresh unit status based on its contracts.
+     * 
+     * Called automatically by ContractObserver when:
+     * - Contract is created
+     * - Contract status changes
+     * - Contract is deleted
+     */
+    public function refreshStatus(): void
+    {
+        $newStatus = $this->calculateStatus();
+
+        if ($this->status !== $newStatus) {
+            $this->update(['status' => $newStatus]);
+        }
+    }
+
+    /**
+     * Calculate what the unit status should be.
+     * 
+     * Logic:
+     * - If has active/pending contract, status is 'rented'
+     * - Otherwise, status is 'available'
+     */
+    private function calculateStatus(): string
+    {
+        $hasActiveContract = $this->contracts()
+            ->whereIn('status', ['active', 'pending'])
+            ->exists();
+
+        return $hasActiveContract ? 'rented' : 'available';
+    }
+
 }

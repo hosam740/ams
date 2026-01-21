@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use App\Models\assets\Unit;
-use Carbon\Carbon;
+//use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Concerns\PaymentGenerationOptimized;
+//use App\Models\Concerns\PaymentGenerationOptimized;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 
@@ -16,7 +16,7 @@ class Contract extends Model
 {
     use HasFactory;
     use SoftDeletes;
-    use PaymentGenerationOptimized;
+    //use PaymentGenerationOptimized;
 
     protected $fillable = ['tenant_id', 'beginning_date', 'end_date', 'total_amount', 'payment_plan', 'status', 'ended_at', 'unit_id'];
 
@@ -81,63 +81,63 @@ class Contract extends Model
     
 
 
-    // this method runs automaticlly when creating, updating, saving a contract in the database. to ensure that no unit has two active contracts
-    protected static function boot()
-    {
-        parent::boot();
+    // // this method runs automaticlly when creating, updating, saving a contract in the database. to ensure that no unit has two active contracts
+    // protected static function boot()
+    // {
+    //     parent::boot();
 
-        static::saving(function ($contract) {
-            static::validateUniqueActiveContract($contract);
-        });
+    //     static::saving(function ($contract) {
+    //         static::validateUniqueActiveContract($contract);
+    //     });
 
-        static::saved(function ($contract) {
-            // توليد عند الإنشاء الأول فقط إذا كان Active
-            if ($contract->wasRecentlyCreated && in_array($contract->status, ['active', 'pending'], true)) {
-                $contract->generatePayments();
-                return;
-            }
+    //     static::saved(function ($contract) {
+    //         // توليد عند الإنشاء الأول فقط إذا كان Active
+    //         if ($contract->wasRecentlyCreated && in_array($contract->status, ['active', 'pending'], true)) {
+    //             $contract->generatePayments();
+    //             return;
+    //         }
 
-            // إعادة توليد عند تغيّر الحقول المؤثرة
-            if ($contract->active && $contract->wasChanged(['beginning_date', 'end_date', 'total_amount', 'payment_plan'])) {
-                $contract->regeneratePayments();
-            }
+    //         // إعادة توليد عند تغيّر الحقول المؤثرة
+    //         if ($contract->active && $contract->wasChanged(['beginning_date', 'end_date', 'total_amount', 'payment_plan'])) {
+    //             $contract->regeneratePayments();
+    //         }
 
-            if (! $contract->unit_id) {
-                return;
-            }
+    //         if (! $contract->unit_id) {
+    //             return;
+    //         }
 
-            if (in_array($contract->status, ['active', 'pending'], true)) {
-                $contract->unit()->update(['status' => 'rented']);
-                return;
-            }
+    //         if (in_array($contract->status, ['active', 'pending'], true)) {
+    //             $contract->unit()->update(['status' => 'rented']);
+    //             return;
+    //         }
 
-            if (in_array($contract->status, ['terminated', 'expired'], true)) {
-                $contract->unit()->update(['status' => 'available']);
-            }
-        });
-    }
+    //         if (in_array($contract->status, ['terminated', 'expired'], true)) {
+    //             $contract->unit()->update(['status' => 'available']);
+    //         }
+    //     });
+    // }
 
 
 
-    // this function throws an error when tring to add active/pending conrtact to a unit that has one
-    private static function validateUniqueActiveContract($contract){
+    // // this function throws an error when tring to add active/pending conrtact to a unit that has one
+    // private static function validateUniqueActiveContract($contract){
 
-        if($contract->status == 'active'){
+    //     if($contract->status == 'active'){
 
-            $query = self::where('unit_id', $contract->unit_id)->whereIn('status', ['active', 'pending']);
+    //         $query = self::where('unit_id', $contract->unit_id)->whereIn('status', ['active', 'pending']);
 
-            if($contract->exists){
-                $query->where('id', '!=', $contract->id);
-            }
+    //         if($contract->exists){
+    //             $query->where('id', '!=', $contract->id);
+    //         }
 
-            if($query->exists()){
-                throw new \InvalidArgumentException(
-                    "Contract with ID {$contract->id} cannot be saved! There is already an active contract for unit {$contract->unit_id}.");
-            }
-        }
+    //         if($query->exists()){
+    //             throw new \InvalidArgumentException(
+    //                 "Contract with ID {$contract->id} cannot be saved! There is already an active contract for unit {$contract->unit_id}.");
+    //         }
+    //     }
         
-        return true;
-    }
+    //     return true;
+    // }
 
     
     // private function generatePayments($startingPaymentNumber = 1){

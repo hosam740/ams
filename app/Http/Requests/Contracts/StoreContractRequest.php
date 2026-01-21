@@ -31,8 +31,8 @@ class StoreContractRequest extends FormRequest
 
             'unit_id'        => ['required', 'integer', Rule::exists('units', 'id')],
             'beginning_date' => ['required', 'date'],
-            'end_date'       => ['required', 'date', 'after:beginning_date', 
-                                function ($attribute, $value, $fail) {$this->validateIsLastOfMonth($attribute, $value, $fail);}],// rule to ensure that end_date is last day in the mounth
+            'end_date'       => ['required', 'date', 'after:beginning_date', 'after_or_equal:today',
+                                function ($attribute, $value, $fail) {$this->validateEndDate($attribute, $value, $fail);}],// rule to ensure that end_date is exactly N months after beginning_date minus 1 day
             //'ended_at'     => ['nullable', 'date', 'after_or_equal:end_date'],
             'total_amount'   => ['required', 'numeric', 'min:0.01'],
             'payment_plan'   => ['required', Rule::in(Contract::getPaymentPlanValues())],
@@ -50,6 +50,7 @@ class StoreContractRequest extends FormRequest
 
             'beginning_date.required' => 'تاريخ بداية العقد مطلوب.',
             'beginning_date.date'     => 'تنسيق تاريخ بداية العقد غير صحيح.',
+            'end_date.after_or_equal' => 'لا يمكن إنشاء عقد منتهي.',
 
             'end_date.required'       => 'تاريخ نهاية العقد مطلوب.',
             'end_date.date'           => 'تنسيق تاريخ نهاية العقد غير صحيح.',
@@ -82,11 +83,43 @@ class StoreContractRequest extends FormRequest
     }
 
 
-    // function to ensure that end_date is last day in the mounth
-    protected function validateIsLastOfMonth($attribute, $value, $fail)
+    /**
+ * Validate that end_date is exactly N months after beginning_date minus 1 day.
+ * 
+ * Example:
+ *   beginning_date = Jan 15
+ *   valid end_dates = Feb 14, Mar 14, Apr 14...
+ */
+    protected function validateEndDate($attribute, $value, $fail)
     {
-        if (!Carbon::parse($value)->isLastOfMonth()) {
-            $fail('تاريخ نهاية العقد يجب أن يكون آخر يوم في الشهر.');
+        if (empty($this->beginning_date)) {
+        return;
+    }
+
+    $beginning = Carbon::parse($this->beginning_date);
+    $end = Carbon::parse($value);
+
+    // Add 1 day to end_date for correct month calculation
+    $diffInMonths = $beginning->diffInMonths($end->copy()->addDay());
+
+    if ($diffInMonths < 1) {
+        $fail('مدة العقد يجب أن تكون شهرا واحد على الأقل.');
+        return;
+    }
+
+    // Expected: beginning + N months - 1 day
+    $expectedEnd = $beginning->copy()->addMonths($diffInMonths)->subDay();
+
+    if (!$end->equalTo($expectedEnd)) {
+        $suggestions = [];
+        for ($i = 1; $i <= 3; $i++) {
+            $suggestions[] = $beginning->copy()
+                ->addMonths($i)
+                ->subDay()
+                ->format('Y-m-d');
+        }
+
+        $fail('تاريخ النهاية غير صحيح. تواريخ مقترحة: ' . implode('، ', $suggestions));
         }
     }
 }
