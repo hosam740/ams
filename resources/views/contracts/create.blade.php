@@ -42,14 +42,18 @@
                 <select name="unit_id" id="unit_id"
                         class="form-select @error('unit_id') is-invalid @enderror" required>
                     <option value="">-- اختر الوحدة --</option>
+                    @php
+                        $selectedUnitId = old('unit_id') ?? request()->query('unit_id');
+                    @endphp
                     @foreach (
                         \App\Models\assets\Unit::query()
                             ->whereHas('property.asset', fn($q) => $q->where('manager_id', Auth::id()))
+                            ->where('status', 'available')
                             ->with(['property.asset'])
                             ->orderBy('id', 'desc')
                             ->get() as $unit
                     )
-                        <option value="{{ $unit->id }}" {{ old('unit_id') == $unit->id ? 'selected' : '' }}>
+                        <option value="{{ $unit->id }}" {{ $selectedUnitId == $unit->id ? 'selected' : '' }}>
                             {{ $unit->name ?? 'وحدة #' . $unit->id }}
                             — {{ ucfirst($unit->type) }}
                             — {{ $unit->area }} م²
@@ -78,6 +82,7 @@
                            class="form-control @error('end_date') is-invalid @enderror"
                            value="{{ old('end_date') }}" required>
                     @error('end_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    <div id="end_date_validation_error" class="invalid-feedback" style="display: none;"></div>
                 </div>
             </div>
 
@@ -123,23 +128,115 @@
     </div>
 </div>
 
-{{-- تحسين: اجعل تاريخ النهاية دائماً بعد البداية --}}
+{{-- تحسين: التحقق من تاريخ النهاية - مضاعفات الشهور فقط --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const begin = document.getElementById('beginning_date');
-    const end   = document.getElementById('end_date');
+    const beginInput = document.getElementById('beginning_date');
+    const endInput = document.getElementById('end_date');
+    const errorDiv = document.getElementById('end_date_validation_error');
+    const form = endInput.closest('form');
 
-    function syncMin() {
-        if (begin.value) {
-            end.min = begin.value;
-            if (end.value && end.value < begin.value) end.value = begin.value;
+    /**
+     * حساب التواريخ الصحيحة لنهاية العقد
+     * القاعدة: تاريخ البداية + N أشهر - يوم واحد
+     */
+    function calculateValidEndDates(startDateStr, maxMonths = 60) {
+        if (!startDateStr) return [];
+
+        const dates = [];
+        const startDate = new Date(startDateStr);
+
+        for (let months = 1; months <= maxMonths; months++) {
+            const validDate = new Date(startDate);
+            validDate.setMonth(validDate.getMonth() + months);
+            validDate.setDate(validDate.getDate() - 1);
+            dates.push(validDate.toISOString().split('T')[0]);
+        }
+
+        return dates;
+    }
+
+    /**
+     * التحقق من صحة تاريخ النهاية
+     * @returns {boolean} true إذا كان التاريخ صحيح، false إذا كان خاطئ
+     */
+    function isEndDateValid() {
+        const beginValue = beginInput.value;
+        const endValue = endInput.value;
+
+        if (!beginValue || !endValue) {
+            return true; // سيتم التحقق من required بواسطة HTML5
+        }
+
+        const validDates = calculateValidEndDates(beginValue, 60);
+        return validDates.includes(endValue);
+    }
+
+    /**
+     * التحقق من صحة تاريخ النهاية وعرض رسالة تحذير إذا لزم الأمر
+     */
+    function validateEndDate() {
+        const beginValue = beginInput.value;
+        const endValue = endInput.value;
+
+        // إخفاء الرسالة إذا لم يتم اختيار تاريخ بداية أو نهاية
+        if (!beginValue || !endValue) {
+            errorDiv.style.display = 'none';
+            endInput.classList.remove('is-invalid');
+            return;
+        }
+
+        const validDates = calculateValidEndDates(beginValue, 60);
+
+        // التحقق: هل التاريخ المختار ضمن التواريخ الصحيحة؟
+        if (validDates.includes(endValue)) {
+            // التاريخ صحيح
+            errorDiv.style.display = 'none';
+            endInput.classList.remove('is-invalid');
         } else {
-            end.removeAttribute('min');
+            // التاريخ خاطئ - عرض رسالة تحذير
+            const suggestions = validDates.slice(0, 3).join('، ');
+            errorDiv.textContent = 'التاريخ غير صحيح. اختر تاريخ مثل: ' + suggestions;
+            errorDiv.style.display = 'block';
+            endInput.classList.add('is-invalid');
         }
     }
 
-    begin.addEventListener('change', syncMin);
-    syncMin();
+    /**
+     * عند تغيير تاريخ البداية: تعيين الحد الأدنى لتاريخ النهاية والتحقق
+     */
+    function onBeginDateChange() {
+        const beginValue = beginInput.value;
+
+        if (beginValue) {
+            const validDates = calculateValidEndDates(beginValue, 60);
+            if (validDates.length > 0) {
+                endInput.min = validDates[0];
+            }
+        } else {
+            endInput.removeAttribute('min');
+        }
+
+        // إعادة التحقق من تاريخ النهاية
+        validateEndDate();
+    }
+
+    // منع إرسال النموذج إذا كان التاريخ خاطئ
+    form.addEventListener('submit', function(e) {
+        if (!isEndDateValid()) {
+            e.preventDefault();
+            validateEndDate(); // عرض رسالة الخطأ
+            endInput.focus(); // التركيز على الحقل الخاطئ
+            return false;
+        }
+    });
+
+    // ربط الأحداث
+    beginInput.addEventListener('change', onBeginDateChange);
+    endInput.addEventListener('change', validateEndDate);
+
+    // التشغيل الأولي
+    onBeginDateChange();
 });
 </script>
 

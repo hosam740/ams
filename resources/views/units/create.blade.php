@@ -7,7 +7,6 @@
 
     @php
         $type_values = \App\Models\assets\Unit::getTypeValues();
-        $status_values = \App\Models\assets\Unit::getStatusValues();
     @endphp
 
     {{-- Page container --}}
@@ -77,18 +76,8 @@
                     @error('type') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
-                <div class="col-md-6">
-                    <label for="status" class="form-label fw-semibold">الحالة</label>
-                    <select id="status" name="status" class="form-select @error('status') is-invalid @enderror" required>
-                        <option value="">اختر الحالة</option>
-                        @foreach($status_values as $status)
-                            <option value="{{ $status }}" @selected(old('status') == $status)>
-                                {{ __('unit.statuses.' . $status) }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('status') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                </div>
+                {{-- Hidden status field - automatically set to available --}}
+                <input type="hidden" name="status" value="available">
 
                 {{-- =================== Description =================== --}}
                 <div class="col-12">
