@@ -78,6 +78,15 @@ class Contract extends Model
         return $this->hasMany(Payment::class, 'contract_id');
     }
 
+    /**
+     * Check if this contract can be edited.
+     * Only pending contracts can be edited.
+     */
+    public function canBeEdited(): bool
+    {
+        return $this->status === 'pending';
+    }
+
     
 
 

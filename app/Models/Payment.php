@@ -93,18 +93,22 @@ class Payment extends Model
 
     /**
      * Check if this payment can be marked as paid.
+     * Contract must be active and payment status must be payable.
      */
     public function canBeMarkedAsPaid(): bool
     {
-        return in_array($this->status, self::$payable_statuses);
+        return $this->contract->status === 'active'
+            && in_array($this->status, self::$payable_statuses);
     }
 
     /**
      * Check if this payment can be cancelled.
+     * Contract must be active and payment status must be cancellable.
      */
     public function canBeCancelled(): bool
     {
-        return in_array($this->status, self::$cancellable_statuses);
+        return $this->contract->status === 'active'
+            && in_array($this->status, self::$cancellable_statuses);
     }
 
     /**

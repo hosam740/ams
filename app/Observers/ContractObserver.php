@@ -55,17 +55,46 @@ class ContractObserver
 
     /**
      * Handle the Contract "updated" event.
-     * 
+     *
      * Refreshes unit status when contract status changes.
+     * Regenerates payments when pending contract's payment-affecting fields change.
      *
      * @param Contract $contract
      * @return void
      */
     public function updated(Contract $contract): void
     {
-        // If status changed, refresh unit status
+        // Refresh unit status when contract status changes
         if ($contract->wasChanged('status')) {
             $contract->unit->refreshStatus();
+        }
+
+        // Regenerate payments if pending contract's payment-affecting fields changed
+        if ($contract->status === 'pending' &&
+            $contract->wasChanged(['beginning_date', 'end_date', 'total_amount', 'payment_plan'])) {
+            $this->regeneratePayments($contract);
+        }
+    }
+
+    /**
+     * Regenerate all payments for a pending contract.
+     * Only deletes non-paid payments as a safety measure.
+     *
+     * @param Contract $contract
+     * @return void
+     */
+    private function regeneratePayments(Contract $contract): void
+    {
+        // Safety: only delete non-paid payments (should be all for pending contracts)
+        $contract->payments()
+            ->whereNotIn('status', ['paid'])
+            ->forceDelete();
+
+        // Generate new payments
+        $paymentsData = $this->generator->generate($contract);
+
+        if (!empty($paymentsData)) {
+            $contract->payments()->createMany($paymentsData);
         }
     }
 

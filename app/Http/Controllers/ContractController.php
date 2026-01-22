@@ -90,7 +90,13 @@ class ContractController extends Controller
      */
     public function edit(Contract $contract)
     {
-        //
+        if (!$contract->canBeEdited()) {
+            return redirect()->route('contracts.show', $contract)
+                ->withErrors(['contract' => 'لا يمكن تعديل هذا العقد']);
+        }
+
+        $contract->load(['tenant', 'unit.property.asset']);
+
         return view('contracts.edit', compact('contract'));
     }
 

@@ -46,14 +46,15 @@
         $endDate = \Carbon\Carbon::parse($contract->end_date);
         $today = \Carbon\Carbon::today();
 
-        $durationMonths = $beginDate->diffInMonths($endDate);
+        $durationMonths = (int) ceil($beginDate->floatDiffInMonths($endDate));
         $durationDays = $beginDate->diffInDays($endDate);
         $daysRemaining = $today->diffInDays($endDate, false); // negative if expired
 
         // 4. Financial Statistics (using collection methods, no queries)
         $totalAmount = $contract->total_amount;
+        $totalPaymentsAmount = $payments->sum('amount'); // مجموع كل الدفعات
         $paidAmount = $payments->where('status', 'paid')->sum('paid_amount');
-        $remainingAmount = $totalAmount - $paidAmount;
+        $remainingAmount = $payments->whereIn('status', ['pending', 'due', 'overdue'])->sum('amount');
         $progressPercentage = $totalAmount > 0 ? round(($paidAmount / $totalAmount) * 100, 1) : 0;
 
         // 5. Payment Statistics (using collection methods, no queries)
@@ -109,19 +110,25 @@
                 </div>
             </div>
 
-            {{-- Terminate button --}}
-            @if(in_array($contract->status, ['active', 'pending']))
-                <div>
-                    <form action="{{ route('contracts.destroy', $contract) }}" method="POST"
+            {{-- Action buttons --}}
+            <div class="d-flex gap-2">
+                @if($contract->canBeEdited())
+                    <a href="{{ route('contracts.edit', $contract) }}" class="btn btn-primary">
+                        <i class="fas fa-edit me-1"></i>
+                        تعديل العقد
+                    </a>
+                @endif
+
+                @if($contract->status === 'active')
+                    <form action="{{ route('contracts.terminate', $contract) }}" method="POST"
                           onsubmit="return confirm('هل أنت متأكد من فسخ هذا العقد؟');">
                         @csrf
-                        @method('DELETE')
                         <button type="submit" class="btn btn-danger">
                             فسخ العقد
                         </button>
                     </form>
-                </div>
-            @endif
+                @endif
+            </div>
         </div>
 
         {{-- Flash messages --}}
@@ -427,6 +434,7 @@
                             <th>تاريخ السداد</th>
                             <th>المبلغ المدفوع</th>
                             <th>الحالة</th>
+                            <th class="text-center">الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -468,6 +476,26 @@
                                         {{ $statusLabel }}
                                     </span>
                                 </td>
+                                <td class="text-center">
+                                    <div class="d-flex gap-1 justify-content-center">
+                                        @if($payment->canBeMarkedAsPaid())
+                                            <button type="button" class="btn btn-sm btn-success"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#markPaidModal{{ $payment->id }}"
+                                                    title="تسجيل السداد">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        @endif
+                                        @if($payment->canBeCancelled())
+                                            <button type="button" class="btn btn-sm btn-danger"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#cancelModal{{ $payment->id }}"
+                                                    title="إلغاء">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        @endif
+                                    </div>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -475,12 +503,13 @@
                         <tr>
                             <td colspan="2" class="fw-bold">الإجمالي</td>
                             <td class="fw-bold">
-                                {{ number_format($totalAmount, 2) }} ر.س
+                                {{ number_format($totalPaymentsAmount, 2) }} ر.س
                             </td>
                             <td></td>
                             <td class="fw-bold">
                                 {{ number_format($paidAmount, 2) }} ر.س
                             </td>
+                            <td></td>
                             <td></td>
                         </tr>
                     </tfoot>
@@ -488,4 +517,94 @@
             </div>
         @endif
     </div>
+
+    {{-- Payment Modals --}}
+    @foreach($payments as $payment)
+        {{-- Mark as Paid Modal --}}
+        @if($payment->canBeMarkedAsPaid())
+            <div class="modal fade" id="markPaidModal{{ $payment->id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{{ route('payments.mark-paid', $payment) }}" method="POST">
+                            @csrf
+                            @method('PATCH')
+                            <div class="modal-header">
+                                <h5 class="modal-title">تسجيل سداد الدفعة #{{ $payment->payment_number }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="form-label">المبلغ المستحق</label>
+                                    <input type="text" class="form-control" value="{{ number_format($payment->amount, 2) }} ر.س" disabled>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="paid_amount{{ $payment->id }}" class="form-label">المبلغ المدفوع <span class="text-danger">*</span></label>
+                                    <input type="number" step="0.01" class="form-control" id="paid_amount{{ $payment->id }}"
+                                           name="paid_amount" value="{{ $payment->amount }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="paid_date{{ $payment->id }}" class="form-label">تاريخ السداد <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="paid_date{{ $payment->id }}"
+                                           name="paid_date" value="{{ now()->format('Y-m-d') }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="payment_method{{ $payment->id }}" class="form-label">طريقة الدفع <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="payment_method{{ $payment->id }}" name="payment_method" required>
+                                        <option value="">اختر...</option>
+                                        @foreach(\App\Models\Payment::getPaymentMethods() as $method)
+                                            <option value="{{ $method }}">
+                                                @switch($method)
+                                                    @case('cash') نقداً @break
+                                                    @case('bank_transfer') تحويل بنكي @break
+                                                    @case('check') شيك @break
+                                                    @default {{ $method }}
+                                                @endswitch
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="notes{{ $payment->id }}" class="form-label">ملاحظات</label>
+                                    <textarea class="form-control" id="notes{{ $payment->id }}" name="notes" rows="2">{{ $payment->notes }}</textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                                <button type="submit" class="btn btn-success">تسجيل السداد</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- Cancel Modal --}}
+        @if($payment->canBeCancelled())
+            <div class="modal fade" id="cancelModal{{ $payment->id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{{ route('payments.cancel', $payment) }}" method="POST">
+                            @csrf
+                            @method('PATCH')
+                            <div class="modal-header">
+                                <h5 class="modal-title">إلغاء الدفعة #{{ $payment->payment_number }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="text-danger">هل أنت متأكد من إلغاء هذه الدفعة؟</p>
+                                <div class="mb-3">
+                                    <label for="cancel_notes{{ $payment->id }}" class="form-label">سبب الإلغاء</label>
+                                    <textarea class="form-control" id="cancel_notes{{ $payment->id }}" name="notes" rows="2">{{ $payment->notes }}</textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">تراجع</button>
+                                <button type="submit" class="btn btn-danger">تأكيد الإلغاء</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endforeach
 @endsection

@@ -10,9 +10,7 @@ use App\Http\Controllers\Authentication\AuthController;
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('dashboard/dashboard');
-});
+
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('show.login');
@@ -23,6 +21,9 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function() {
+
+
+    Route::get('/', function () {return view('dashboard/dashboard');})->name('dashboard');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
