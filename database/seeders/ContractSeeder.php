@@ -10,6 +10,9 @@ use Illuminate\Database\Seeder;
 
 class ContractSeeder extends Seeder
 {
+    // Fixed reference date for consistent demo data
+    private const REFERENCE_DATE = '2025-06-01';
+
     /**
      * Run the database seeds.
      */
@@ -29,8 +32,8 @@ class ContractSeeder extends Seeder
         Contract::create([
             'tenant_id' => $tenants[0]->id,
             'unit_id' => $units[0]->id,
-            'beginning_date' => Carbon::now()->subMonths(3)->format('Y-m-d'),
-            'end_date' => Carbon::now()->addMonths(9)->format('Y-m-d'),
+            'beginning_date' => Carbon::parse(self::REFERENCE_DATE)->subMonths(3)->format('Y-m-d'),
+            'end_date' => Carbon::parse(self::REFERENCE_DATE)->addMonths(9)->format('Y-m-d'),
             'total_amount' => 36000,
             'payment_plan' => 'monthly',
             'status' => 'active',
@@ -40,8 +43,8 @@ class ContractSeeder extends Seeder
         Contract::create([
             'tenant_id' => $tenants[1]->id,
             'unit_id' => $units[2]->id,
-            'beginning_date' => Carbon::now()->subMonths(2)->format('Y-m-d'),
-            'end_date' => Carbon::now()->addMonths(10)->format('Y-m-d'),
+            'beginning_date' => Carbon::parse(self::REFERENCE_DATE)->subMonths(2)->format('Y-m-d'),
+            'end_date' => Carbon::parse(self::REFERENCE_DATE)->addMonths(10)->format('Y-m-d'),
             'total_amount' => 48000,
             'payment_plan' => 'quarterly',
             'status' => 'active',
@@ -51,8 +54,8 @@ class ContractSeeder extends Seeder
         Contract::create([
             'tenant_id' => $tenants[2]->id,
             'unit_id' => $units[3]->id,
-            'beginning_date' => Carbon::now()->addDays(15)->format('Y-m-d'),
-            'end_date' => Carbon::now()->addMonths(12)->addDays(15)->format('Y-m-d'),
+            'beginning_date' => Carbon::parse(self::REFERENCE_DATE)->addDays(15)->format('Y-m-d'),
+            'end_date' => Carbon::parse(self::REFERENCE_DATE)->addMonths(12)->addDays(15)->format('Y-m-d'),
             'total_amount' => 60000,
             'payment_plan' => 'semiannual',
             'status' => 'pending',
@@ -62,8 +65,8 @@ class ContractSeeder extends Seeder
         Contract::create([
             'tenant_id' => $tenants[3]->id,
             'unit_id' => $units[5]->id,
-            'beginning_date' => Carbon::now()->addDays(30)->format('Y-m-d'),
-            'end_date' => Carbon::now()->addMonths(12)->addDays(30)->format('Y-m-d'),
+            'beginning_date' => Carbon::parse(self::REFERENCE_DATE)->addDays(30)->format('Y-m-d'),
+            'end_date' => Carbon::parse(self::REFERENCE_DATE)->addMonths(12)->addDays(30)->format('Y-m-d'),
             'total_amount' => 24000,
             'payment_plan' => 'annually',
             'status' => 'pending',
@@ -73,8 +76,8 @@ class ContractSeeder extends Seeder
         Contract::create([
             'tenant_id' => $tenants[4]->id,
             'unit_id' => $units[1]->id,
-            'beginning_date' => Carbon::now()->subMonths(18)->format('Y-m-d'),
-            'end_date' => Carbon::now()->subMonths(6)->format('Y-m-d'),
+            'beginning_date' => Carbon::parse(self::REFERENCE_DATE)->subMonths(18)->format('Y-m-d'),
+            'end_date' => Carbon::parse(self::REFERENCE_DATE)->subMonths(6)->format('Y-m-d'),
             'total_amount' => 30000,
             'payment_plan' => 'monthly',
             'status' => 'expired',
@@ -84,8 +87,8 @@ class ContractSeeder extends Seeder
         Contract::create([
             'tenant_id' => $tenants[0]->id,
             'unit_id' => $units[6]->id,
-            'beginning_date' => Carbon::now()->subMonths(24)->format('Y-m-d'),
-            'end_date' => Carbon::now()->subMonths(12)->format('Y-m-d'),
+            'beginning_date' => Carbon::parse(self::REFERENCE_DATE)->subMonths(24)->format('Y-m-d'),
+            'end_date' => Carbon::parse(self::REFERENCE_DATE)->subMonths(12)->format('Y-m-d'),
             'total_amount' => 40000,
             'payment_plan' => 'quarterly',
             'status' => 'expired',
@@ -116,8 +119,8 @@ class ContractSeeder extends Seeder
                 ['unit_id' => $availableUnitsArray[0]->id, 'status' => 'active'],
                 [
                     'tenant_id' => $tenants[1]->id,
-                    'beginning_date' => Carbon::now()->subMonths(1)->format('Y-m-d'),
-                    'end_date' => Carbon::now()->addMonths(11)->format('Y-m-d'),
+                    'beginning_date' => Carbon::parse(self::REFERENCE_DATE)->subMonths(1)->format('Y-m-d'),
+                    'end_date' => Carbon::parse(self::REFERENCE_DATE)->addMonths(11)->format('Y-m-d'),
                     'total_amount' => 45000,
                     'payment_plan' => 'triannual',
                 ]
@@ -130,8 +133,8 @@ class ContractSeeder extends Seeder
                 ['unit_id' => $availableUnitsArray[1]->id, 'status' => 'active'],
                 [
                     'tenant_id' => $tenants[2]->id,
-                    'beginning_date' => Carbon::now()->subMonths(4)->format('Y-m-d'),
-                    'end_date' => Carbon::now()->addMonths(8)->format('Y-m-d'),
+                    'beginning_date' => Carbon::parse(self::REFERENCE_DATE)->subMonths(4)->format('Y-m-d'),
+                    'end_date' => Carbon::parse(self::REFERENCE_DATE)->addMonths(8)->format('Y-m-d'),
                     'total_amount' => 30000,
                     'payment_plan' => 'monthly',
                 ]
@@ -144,8 +147,8 @@ class ContractSeeder extends Seeder
                 ['unit_id' => $availableUnitsArray[2]->id, 'status' => 'active'],
                 [
                     'tenant_id' => $tenants[3]->id,
-                    'beginning_date' => Carbon::now()->subMonths(2)->format('Y-m-d'),
-                    'end_date' => Carbon::now()->addMonths(10)->format('Y-m-d'),
+                    'beginning_date' => Carbon::parse(self::REFERENCE_DATE)->subMonths(2)->format('Y-m-d'),
+                    'end_date' => Carbon::parse(self::REFERENCE_DATE)->addMonths(10)->format('Y-m-d'),
                     'total_amount' => 54000,
                     'payment_plan' => 'quarterly',
                 ]
@@ -158,8 +161,8 @@ class ContractSeeder extends Seeder
                 ['unit_id' => $availableUnitsArray[3]->id, 'status' => 'active'],
                 [
                     'tenant_id' => $tenants[4]->id,
-                    'beginning_date' => Carbon::now()->subMonth()->format('Y-m-d'),
-                    'end_date' => Carbon::now()->addMonths(11)->format('Y-m-d'),
+                    'beginning_date' => Carbon::parse(self::REFERENCE_DATE)->subMonth()->format('Y-m-d'),
+                    'end_date' => Carbon::parse(self::REFERENCE_DATE)->addMonths(11)->format('Y-m-d'),
                     'total_amount' => 42000,
                     'payment_plan' => 'semiannual',
                 ]
@@ -172,8 +175,8 @@ class ContractSeeder extends Seeder
                 ['unit_id' => $availableUnitsArray[4]->id, 'status' => 'active'],
                 [
                     'tenant_id' => $tenants[0]->id,
-                    'beginning_date' => Carbon::now()->subMonths(5)->format('Y-m-d'),
-                    'end_date' => Carbon::now()->addMonths(7)->format('Y-m-d'),
+                    'beginning_date' => Carbon::parse(self::REFERENCE_DATE)->subMonths(5)->format('Y-m-d'),
+                    'end_date' => Carbon::parse(self::REFERENCE_DATE)->addMonths(7)->format('Y-m-d'),
                     'total_amount' => 60000,
                     'payment_plan' => 'annually',
                 ]
@@ -186,8 +189,8 @@ class ContractSeeder extends Seeder
                 ['unit_id' => $availableUnitsArray[5]->id, 'status' => 'pending'],
                 [
                     'tenant_id' => $tenants[1]->id,
-                    'beginning_date' => Carbon::now()->addDays(20)->format('Y-m-d'),
-                    'end_date' => Carbon::now()->addMonths(12)->addDays(20)->format('Y-m-d'),
+                    'beginning_date' => Carbon::parse(self::REFERENCE_DATE)->addDays(20)->format('Y-m-d'),
+                    'end_date' => Carbon::parse(self::REFERENCE_DATE)->addMonths(12)->addDays(20)->format('Y-m-d'),
                     'total_amount' => 36000,
                     'payment_plan' => 'monthly',
                 ]
@@ -200,8 +203,8 @@ class ContractSeeder extends Seeder
                 ['unit_id' => $availableUnitsArray[6]->id, 'status' => 'pending'],
                 [
                     'tenant_id' => $tenants[2]->id,
-                    'beginning_date' => Carbon::now()->addDays(10)->format('Y-m-d'),
-                    'end_date' => Carbon::now()->addMonths(12)->addDays(10)->format('Y-m-d'),
+                    'beginning_date' => Carbon::parse(self::REFERENCE_DATE)->addDays(10)->format('Y-m-d'),
+                    'end_date' => Carbon::parse(self::REFERENCE_DATE)->addMonths(12)->addDays(10)->format('Y-m-d'),
                     'total_amount' => 48000,
                     'payment_plan' => 'quarterly',
                 ]
@@ -214,8 +217,8 @@ class ContractSeeder extends Seeder
                 ['unit_id' => $availableUnitsArray[7]->id, 'status' => 'pending'],
                 [
                     'tenant_id' => $tenants[3]->id,
-                    'beginning_date' => Carbon::now()->addDays(25)->format('Y-m-d'),
-                    'end_date' => Carbon::now()->addMonths(12)->addDays(25)->format('Y-m-d'),
+                    'beginning_date' => Carbon::parse(self::REFERENCE_DATE)->addDays(25)->format('Y-m-d'),
+                    'end_date' => Carbon::parse(self::REFERENCE_DATE)->addMonths(12)->addDays(25)->format('Y-m-d'),
                     'total_amount' => 33000,
                     'payment_plan' => 'triannual',
                 ]
@@ -228,8 +231,8 @@ class ContractSeeder extends Seeder
                 ['unit_id' => $availableUnitsArray[8]->id, 'status' => 'active'],
                 [
                     'tenant_id' => $tenants[4]->id,
-                    'beginning_date' => Carbon::now()->subMonths(6)->format('Y-m-d'),
-                    'end_date' => Carbon::now()->addMonths(6)->format('Y-m-d'),
+                    'beginning_date' => Carbon::parse(self::REFERENCE_DATE)->subMonths(6)->format('Y-m-d'),
+                    'end_date' => Carbon::parse(self::REFERENCE_DATE)->addMonths(6)->format('Y-m-d'),
                     'total_amount' => 27000,
                     'payment_plan' => 'monthly',
                 ]
@@ -242,8 +245,8 @@ class ContractSeeder extends Seeder
                 ['unit_id' => $availableUnitsArray[9]->id, 'status' => 'active'],
                 [
                     'tenant_id' => $tenants[0]->id,
-                    'beginning_date' => Carbon::now()->subMonths(3)->format('Y-m-d'),
-                    'end_date' => Carbon::now()->addMonths(9)->format('Y-m-d'),
+                    'beginning_date' => Carbon::parse(self::REFERENCE_DATE)->subMonths(3)->format('Y-m-d'),
+                    'end_date' => Carbon::parse(self::REFERENCE_DATE)->addMonths(9)->format('Y-m-d'),
                     'total_amount' => 72000,
                     'payment_plan' => 'semiannual',
                 ]
@@ -256,8 +259,8 @@ class ContractSeeder extends Seeder
                 ['unit_id' => $availableUnitsArray[10]->id, 'status' => 'pending'],
                 [
                     'tenant_id' => $tenants[1]->id,
-                    'beginning_date' => Carbon::now()->addWeeks(2)->format('Y-m-d'),
-                    'end_date' => Carbon::now()->addMonths(12)->addWeeks(2)->format('Y-m-d'),
+                    'beginning_date' => Carbon::parse(self::REFERENCE_DATE)->addWeeks(2)->format('Y-m-d'),
+                    'end_date' => Carbon::parse(self::REFERENCE_DATE)->addMonths(12)->addWeeks(2)->format('Y-m-d'),
                     'total_amount' => 50000,
                     'payment_plan' => 'annually',
                 ]
@@ -270,8 +273,8 @@ class ContractSeeder extends Seeder
                 ['unit_id' => $availableUnitsArray[11]->id, 'status' => 'active'],
                 [
                     'tenant_id' => $tenants[2]->id,
-                    'beginning_date' => Carbon::now()->subWeeks(3)->format('Y-m-d'),
-                    'end_date' => Carbon::now()->addMonths(12)->subWeeks(3)->format('Y-m-d'),
+                    'beginning_date' => Carbon::parse(self::REFERENCE_DATE)->subWeeks(3)->format('Y-m-d'),
+                    'end_date' => Carbon::parse(self::REFERENCE_DATE)->addMonths(12)->subWeeks(3)->format('Y-m-d'),
                     'total_amount' => 38000,
                     'payment_plan' => 'quarterly',
                 ]
